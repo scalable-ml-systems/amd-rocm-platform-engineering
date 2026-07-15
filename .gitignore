@@ -1,0 +1,60 @@
+# Local notes
+notes*/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Generated benchmark artifacts
+benchmark-results/raw/*
+!benchmark-results/raw/.gitkeep
+
+# Large profiler artifacts
+profiler-traces/*
+!profiler-traces/.gitkeep
+
+# Temporary logs
+*.log
+logs/
+tmp/
+temp/
+
+# Model artifacts
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+models/
+checkpoints/
+
+# Kubernetes-generated files
+kubeconfig
+*.kubeconfig
