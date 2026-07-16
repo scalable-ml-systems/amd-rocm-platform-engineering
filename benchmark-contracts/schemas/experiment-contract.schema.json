@@ -1,0 +1,230 @@
+{
+  "$defs": {
+    "ExecutionType": {
+      "description": "Supported experiment execution categories.",
+      "enum": [
+        "validation",
+        "benchmark",
+        "profiling",
+        "failure_injection"
+      ],
+      "title": "ExecutionType",
+      "type": "string"
+    },
+    "ExperimentStatus": {
+      "description": "Lifecycle states for a declared experiment.",
+      "enum": [
+        "planned",
+        "ready",
+        "running",
+        "completed",
+        "blocked",
+        "cancelled"
+      ],
+      "title": "ExperimentStatus",
+      "type": "string"
+    },
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "A metric that the experiment intends to collect.",
+      "properties": {
+        "name": {
+          "description": "Metric name in lowercase snake case.",
+          "minLength": 3,
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "description": "Explicit measurement unit.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+          "title": "Unit",
+          "type": "string"
+        },
+        "description": {
+          "description": "What the metric measures and why it matters.",
+          "minLength": 10,
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "unit",
+        "description"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Declared intent and acceptance boundary for one experiment.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "experiment_id": {
+      "description": "Stable identifier using exp-p<phase>-<sequence>-<descriptive-name>.",
+      "title": "Experiment Id",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 160,
+      "minLength": 10,
+      "title": "Title",
+      "type": "string"
+    },
+    "phase": {
+      "maximum": 8,
+      "minimum": 0,
+      "title": "Phase",
+      "type": "integer"
+    },
+    "workstream": {
+      "minLength": 3,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "title": "Workstream",
+      "type": "string"
+    },
+    "execution_type": {
+      "$ref": "#/$defs/ExecutionType"
+    },
+    "status": {
+      "$ref": "#/$defs/ExperimentStatus",
+      "default": "planned"
+    },
+    "objective": {
+      "minLength": 20,
+      "title": "Objective",
+      "type": "string"
+    },
+    "question": {
+      "minLength": 20,
+      "title": "Question",
+      "type": "string"
+    },
+    "hypothesis": {
+      "minLength": 20,
+      "title": "Hypothesis",
+      "type": "string"
+    },
+    "prerequisites": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Prerequisites",
+      "type": "array"
+    },
+    "hardware_profile_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hardware Profile Id"
+    },
+    "software_stack_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Software Stack Id"
+    },
+    "workload_profile_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workload Profile Id"
+    },
+    "independent_variable": {
+      "minLength": 3,
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$",
+      "title": "Independent Variable",
+      "type": "string"
+    },
+    "controlled_variables": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Controlled Variables",
+      "type": "array"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/MetricDefinition"
+      },
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "acceptance_criteria": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Acceptance Criteria",
+      "type": "array"
+    },
+    "stop_conditions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Stop Conditions",
+      "type": "array"
+    },
+    "evidence_required": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence Required",
+      "type": "array"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Notes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "experiment_id",
+    "title",
+    "phase",
+    "workstream",
+    "execution_type",
+    "objective",
+    "question",
+    "hypothesis",
+    "independent_variable",
+    "controlled_variables",
+    "metrics",
+    "acceptance_criteria",
+    "stop_conditions",
+    "evidence_required"
+  ],
+  "title": "ExperimentContract",
+  "type": "object"
+}
