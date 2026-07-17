@@ -30,3 +30,6 @@ Production qualification and architecture-aware inference engineering for AMD In
 - [Hardware Profile Contract](benchmark-contracts/HARDWARE-PROFILE-CONTRACT.md)
 - [Workload Profile Contract](benchmark-contracts/WORKLOAD-PROFILE-CONTRACT.md)
 - [Experiment Result Contract](benchmark-contracts/EXPERIMENT-RESULT-CONTRACT.md)
+- [Evidence Contract](EVIDENCE-CONTRACT.md)
+- [Failure Atlas Template](failure-atlas/TEMPLATE.md)
+- [Operator Rule Template](operator-playbooks/RULE-TEMPLATE.md)
