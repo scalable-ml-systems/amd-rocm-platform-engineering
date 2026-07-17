@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "run_id": "run-20260716T120000Z-a1b2c3d4",
+  "experiment_id": "exp-p02-003-pinned-memory-transfer",
+  "hardware_profile_id": "hw-example-mi300x-8x-spx-nps1",
+  "software_stack_id": "sw-example-vllm-aiter-bf16-r01",
+  "workload_profile_id": null,
+  "git_revision": "a1b2c3d4",
+  "started_at_utc": "2026-07-16T12:00:00Z",
+  "finished_at_utc": "2026-07-16T12:05:00Z",
+  "status": "pass",
+  "exit_code": 0,
+  "summary_metrics": [
+    {
+      "name": "host_to_device_bandwidth_gib_per_second",
+      "value": 42.5,
+      "unit": "gib_per_second"
+    },
+    {
+      "name": "transfer_latency_milliseconds",
+      "value": 3.8,
+      "unit": "milliseconds"
+    }
+  ],
+  "evidence_paths": [
+    "stdout.log",
+    "stderr.log",
+    "transfer-metrics.json"
+  ],
+  "notes": [
+    "Example result only. Values are not real benchmark evidence."
+  ]
+}

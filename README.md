@@ -29,3 +29,4 @@ Production qualification and architecture-aware inference engineering for AMD In
 - [Software Compatibility Matrix](SOFTWARE-COMPATIBILITY-MATRIX.md)
 - [Hardware Profile Contract](benchmark-contracts/HARDWARE-PROFILE-CONTRACT.md)
 - [Workload Profile Contract](benchmark-contracts/WORKLOAD-PROFILE-CONTRACT.md)
+- [Experiment Result Contract](benchmark-contracts/EXPERIMENT-RESULT-CONTRACT.md)
