@@ -1,0 +1,23 @@
+schema_version: "1.0"
+
+software_stack_id: sw-example-vllm-aiter-bf16-r01
+
+operating_system: Ubuntu 24.04
+linux_kernel: example-kernel-version
+
+amdgpu_driver: example-amdgpu-version
+rocm_version: example-rocm-version
+
+python_version: example-python-version
+pytorch_version: example-pytorch-version
+
+container_image: example-registry/example-vllm-rocm:example-tag
+container_image_digest: null
+
+execution_engine: vllm
+execution_engine_version: example-vllm-version
+
+rccl_version: example-rccl-version
+triton_version: example-triton-version
+aiter_version: example-aiter-version
+atom_version: null
