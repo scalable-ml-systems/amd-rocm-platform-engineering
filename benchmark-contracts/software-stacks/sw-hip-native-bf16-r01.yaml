@@ -1,0 +1,23 @@
+schema_version: "1.0"
+
+software_stack_id: sw-hip-native-bf16-r01
+
+operating_system: placeholder-operating-system
+linux_kernel: placeholder-kernel-version
+
+amdgpu_driver: placeholder-amdgpu-version
+rocm_version: placeholder-rocm-version
+
+python_version: null
+pytorch_version: null
+
+container_image: null
+container_image_digest: null
+
+execution_engine: hip
+execution_engine_version: placeholder-hip-version
+
+rccl_version: null
+triton_version: null
+aiter_version: null
+atom_version: null
