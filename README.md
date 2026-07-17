@@ -19,3 +19,12 @@ Production qualification and architecture-aware inference engineering for AMD In
 ## Project Status
 
 ### Phase 0 — Project Foundation and Evidence Contracts
+
+### Engineering Standards
+
+- [Repository Naming Conventions](NAMING-CONVENTIONS.md)
+- [Experiment Contract](benchmark-contracts/EXPERIMENT-CONTRACT.md)
+- [Hardware Profile Contract](benchmark-contracts/HARDWARE-PROFILE-CONTRACT.md)
+- [Evidence Contract](EVIDENCE-CONTRACT.md)
+- [Software Compatibility Matrix](SOFTWARE-COMPATIBILITY-MATRIX.md)
+- [Hardware Profile Contract](benchmark-contracts/HARDWARE-PROFILE-CONTRACT.md)

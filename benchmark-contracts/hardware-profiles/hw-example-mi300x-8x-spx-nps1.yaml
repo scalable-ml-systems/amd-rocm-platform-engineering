@@ -1,0 +1,22 @@
+schema_version: "1.0"
+
+hardware_profile_id: hw-example-mi300x-8x-spx-nps1
+
+provider: example-provider
+node_type: example-mi300x-eight-gpu-node
+
+gpu_model: AMD Instinct MI300X
+gpu_architecture: gfx942
+
+physical_gpu_count: 8
+logical_gpu_count: 8
+
+hbm_gib_per_gpu: 192
+
+compute_partition_mode: spx
+memory_partition_mode: nps1
+gpu_interconnect: xgmi
+
+cpu_model: AMD EPYC
+system_memory_gib: 1536
+numa_node_count: 8

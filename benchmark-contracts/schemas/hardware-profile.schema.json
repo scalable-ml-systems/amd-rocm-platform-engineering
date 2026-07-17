@@ -1,0 +1,110 @@
+{
+  "$defs": {
+    "GpuInterconnectType": {
+      "description": "Primary communication path between GPUs.",
+      "enum": [
+        "pcie",
+        "xgmi",
+        "mixed",
+        "unknown"
+      ],
+      "title": "GpuInterconnectType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Stable hardware facts required to interpret an experiment.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "hardware_profile_id": {
+      "title": "Hardware Profile Id",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 2,
+      "title": "Provider",
+      "type": "string"
+    },
+    "node_type": {
+      "minLength": 2,
+      "title": "Node Type",
+      "type": "string"
+    },
+    "gpu_model": {
+      "minLength": 2,
+      "title": "Gpu Model",
+      "type": "string"
+    },
+    "gpu_architecture": {
+      "minLength": 2,
+      "title": "Gpu Architecture",
+      "type": "string"
+    },
+    "physical_gpu_count": {
+      "minimum": 1,
+      "title": "Physical Gpu Count",
+      "type": "integer"
+    },
+    "logical_gpu_count": {
+      "minimum": 1,
+      "title": "Logical Gpu Count",
+      "type": "integer"
+    },
+    "hbm_gib_per_gpu": {
+      "exclusiveMinimum": 0,
+      "title": "Hbm Gib Per Gpu",
+      "type": "number"
+    },
+    "compute_partition_mode": {
+      "minLength": 2,
+      "title": "Compute Partition Mode",
+      "type": "string"
+    },
+    "memory_partition_mode": {
+      "minLength": 2,
+      "title": "Memory Partition Mode",
+      "type": "string"
+    },
+    "gpu_interconnect": {
+      "$ref": "#/$defs/GpuInterconnectType"
+    },
+    "cpu_model": {
+      "minLength": 2,
+      "title": "Cpu Model",
+      "type": "string"
+    },
+    "system_memory_gib": {
+      "exclusiveMinimum": 0,
+      "title": "System Memory Gib",
+      "type": "number"
+    },
+    "numa_node_count": {
+      "minimum": 1,
+      "title": "Numa Node Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "hardware_profile_id",
+    "provider",
+    "node_type",
+    "gpu_model",
+    "gpu_architecture",
+    "physical_gpu_count",
+    "logical_gpu_count",
+    "hbm_gib_per_gpu",
+    "compute_partition_mode",
+    "memory_partition_mode",
+    "gpu_interconnect",
+    "cpu_model",
+    "system_memory_gib",
+    "numa_node_count"
+  ],
+  "title": "HardwareProfile",
+  "type": "object"
+}
