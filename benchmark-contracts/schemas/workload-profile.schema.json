@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "ArrivalPattern": {
+      "description": "How inference requests enter the serving system.",
+      "enum": [
+        "single",
+        "steady",
+        "burst",
+        "closed_loop"
+      ],
+      "title": "ArrivalPattern",
+      "type": "string"
+    },
+    "WorkloadType": {
+      "description": "Supported high-level workload categories.",
+      "enum": [
+        "inference",
+        "training"
+      ],
+      "title": "WorkloadType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Reusable workload inputs for an experiment.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "workload_profile_id": {
+      "title": "Workload Profile Id",
+      "type": "string"
+    },
+    "workload_type": {
+      "$ref": "#/$defs/WorkloadType"
+    },
+    "model_name": {
+      "minLength": 2,
+      "title": "Model Name",
+      "type": "string"
+    },
+    "model_revision": {
+      "minLength": 1,
+      "title": "Model Revision",
+      "type": "string"
+    },
+    "input_token_count": {
+      "minimum": 1,
+      "title": "Input Token Count",
+      "type": "integer"
+    },
+    "output_token_count": {
+      "minimum": 1,
+      "title": "Output Token Count",
+      "type": "integer"
+    },
+    "request_count": {
+      "minimum": 1,
+      "title": "Request Count",
+      "type": "integer"
+    },
+    "concurrency": {
+      "minimum": 1,
+      "title": "Concurrency",
+      "type": "integer"
+    },
+    "arrival_pattern": {
+      "$ref": "#/$defs/ArrivalPattern"
+    },
+    "random_seed": {
+      "minimum": 0,
+      "title": "Random Seed",
+      "type": "integer"
+    },
+    "tensor_parallel_size": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Tensor Parallel Size",
+      "type": "integer"
+    },
+    "data_parallel_size": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Data Parallel Size",
+      "type": "integer"
+    },
+    "expert_parallel_size": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Expert Parallel Size",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "workload_profile_id",
+    "workload_type",
+    "model_name",
+    "model_revision",
+    "input_token_count",
+    "output_token_count",
+    "request_count",
+    "concurrency",
+    "arrival_pattern",
+    "random_seed"
+  ],
+  "title": "WorkloadProfile",
+  "type": "object"
+}

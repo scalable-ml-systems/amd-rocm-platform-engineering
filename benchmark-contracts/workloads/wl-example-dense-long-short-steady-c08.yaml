@@ -1,0 +1,20 @@
+schema_version: "1.0"
+
+workload_profile_id: wl-example-dense-long-short-steady-c08
+workload_type: inference
+
+model_name: example-dense-model
+model_revision: example-model-revision
+
+input_token_count: 8192
+output_token_count: 256
+
+request_count: 100
+concurrency: 8
+
+arrival_pattern: steady
+random_seed: 42
+
+tensor_parallel_size: 1
+data_parallel_size: 1
+expert_parallel_size: 1
