@@ -1,0 +1,70 @@
+schema_version: "1.0"
+
+support_baseline_id: support-mi300x-rocm-host-r01
+baseline_status: draft
+
+target_hardware:
+  gpu_vendor: AMD
+  gpu_family: Instinct
+  gpu_model: AMD Instinct MI300X
+  gpu_architecture: gfx942
+  expected_physical_gpu_count: null
+  deployment_type: null
+
+target_host_stack:
+  operating_system: null
+  operating_system_version: null
+  kernel_version: null
+  amdgpu_driver_version: null
+  rocm_version: null
+  firmware_ifwi_version: null
+
+target_framework_stack:
+  python_version: null
+  pytorch_version: null
+
+required_host_tools:
+  - amd-smi
+  - rocminfo
+  - clinfo
+  - rocm_agent_enumerator
+  - rvs
+
+planned_container_baseline:
+  container_engine: null
+  container_engine_version: null
+  amd_container_toolkit_version: null
+  cdi_validation_required: true
+  container_image: null
+  container_image_digest: null
+
+support_authority:
+  compatibility_matrix:
+    name: AMD ROCm compatibility matrix
+    source_url: "https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html"
+    checked_at_utc: null
+    selected_rocm_matrix_version: null
+
+  hardware_specification:
+    name: AMD ROCm GPU hardware specifications
+    source_url: "https://rocm.docs.amd.com/en/latest/reference/gpu-arch-specs.html"
+    checked_at_utc: null
+
+  validation_suite:
+    name: AMD ROCm Validation Suite documentation
+    source_url: "https://rocm.docs.amd.com/projects/ROCmValidationSuite/en/latest/"
+    checked_at_utc: null
+
+  container_runtime:
+    name: AMD Container Runtime Toolkit documentation
+    source_url: "https://instinct.docs.amd.com/projects/container-toolkit/en/latest/"
+    checked_at_utc: null
+
+support_decision:
+  status: pending
+  unsupported_components: []
+  accepted_exceptions: []
+  notes:
+    - Exact versions must be selected before host qualification begins.
+    - Actual host values will be compared with this baseline during Phase 1.
+    - No performance conclusion is allowed from this file.

@@ -1,0 +1,84 @@
+schema_version: "1.0"
+
+experiment_id: exp-p01-001-amd-host-qualification
+title: Pageable versus pinned host-memory transfer on AMD Instinct
+phase: 1 
+workstream: memory-and-streams
+
+execution_type: benchmark
+status: planned
+
+objective: >
+  Measure how pageable and pinned host-memory allocation affect
+  host-to-device transfer performance on an AMD Instinct GPU.
+
+question: >
+  Does pinned host memory provide measurably higher transfer bandwidth
+  and lower CPU blocking than pageable host memory for identical buffers?
+
+hypothesis: >
+  Pinned host memory will provide higher sustained host-to-device
+  bandwidth and enable more effective asynchronous transfer behavior
+  than pageable host memory.
+
+prerequisites:
+  - Phase 1 host qualification passed.
+  - Phase 1 container qualification passed.
+  - HIP compiler and runtime are available.
+  - The GPU is idle before the experiment starts.
+
+hardware_profile_id: hw-example-mi300x-8x-spx-nps1
+software_stack_id: sw-hip-native-bf16-r01
+workload_profile_id: null
+
+independent_variable: host_memory_type
+
+controlled_variables:
+  - GPU device
+  - CPU NUMA placement
+  - transfer direction
+  - buffer sizes
+  - number of warm-up runs
+  - number of measured repetitions
+  - HIP stream configuration
+  - compiler optimization level
+
+metrics:
+  - name: host_to_device_bandwidth_gib_per_second
+    unit: gib_per_second
+    description: >
+      Effective host-to-device transfer bandwidth for each host-memory type.
+
+  - name: transfer_latency_milliseconds
+    unit: milliseconds
+    description: >
+      Elapsed transfer latency for each tested buffer size.
+
+  - name: cpu_blocking_duration_milliseconds
+    unit: milliseconds
+    description: >
+      Time during which the host thread is blocked by the transfer operation.
+
+acceptance_criteria:
+  - All transferred buffers pass byte-for-byte correctness validation.
+  - At least five measured repetitions complete for every buffer size.
+  - The resulting evidence distinguishes pageable and pinned memory results.
+  - Hardware and software profile identifiers are recorded with the result.
+
+stop_conditions:
+  - Any transferred buffer fails correctness validation.
+  - The GPU reports a reset, memory fault, or KFD error.
+  - The active GPU or NUMA placement differs from the declared configuration.
+  - System memory pressure makes the measured runs non-comparable.
+
+evidence_required:
+  - run-manifest.json
+  - environment.json
+  - software-bill-of-materials.json
+  - transfer-metrics.json
+  - stdout.log
+  - stderr.log
+
+notes:
+  - Performance thresholds will be established from the first healthy baseline.
+  - NUMA placement will remain fixed during the initial comparison.

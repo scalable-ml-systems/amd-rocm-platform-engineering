@@ -33,3 +33,8 @@ Production qualification and architecture-aware inference engineering for AMD In
 - [Evidence Contract](EVIDENCE-CONTRACT.md)
 - [Failure Atlas Template](failure-atlas/TEMPLATE.md)
 - [Operator Rule Template](operator-playbooks/RULE-TEMPLATE.md)
+
+## Phase 1 
+- [AMD Host Qualification and ROCm Baseline](phase-1-host-qualification/README.md) 
+- [Host Qualification Experiment](benchmark-contracts/experiments/exp-p01-001-amd-host-qualification/experiment.yaml) 
+- [AMD Support Baseline](benchmark-contracts/support-baselines/support-mi301x-rocm-host-r01.yaml)
