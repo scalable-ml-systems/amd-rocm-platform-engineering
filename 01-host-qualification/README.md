@@ -1,4 +1,4 @@
-# Phase 1 — AMD Host Qualification and ROCm Baseline
+# Phase 01 — AMD Host Qualification and ROCm Baseline
 
 Phase 1 determines whether an AMD Instinct node provides a supported and internally consistent execution environment across:
 

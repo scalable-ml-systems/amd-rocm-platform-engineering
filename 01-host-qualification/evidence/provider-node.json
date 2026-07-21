@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "captured_at_utc": "2026-07-21T15:16:36.359238Z",
+  "provider": "my-cloud",
+  "provider_node_id": "node-123",
+  "provider_node_type": "mi300x-1x",
+  "provider_image_id": "image-abc",
+  "hostname": "bn-jfrounjian-mac",
+  "deployment_type": "bare_metal",
+  "gpu_access_mode": "direct",
+  "advertised_gpu_model": "AMD Instinct MI300X",
+  "advertised_physical_gpu_count": 1,
+  "advertised_hbm_gib_per_gpu": 192.0,
+  "allocated_cpu_count": 64,
+  "advertised_system_memory_gib": 512.0,
+  "advertised_storage_gib": 2000.0,
+  "advertised_network": "2x 100GbE, not disclosed further",
+  "administrative_access": "sudo",
+  "driver_management": "provider_managed",
+  "claim_source": "provider console",
+  "notes": [
+    "Values captured before host qualification commands were run."
+  ]
+}
