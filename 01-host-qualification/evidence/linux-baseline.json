@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "captured_at_utc": "2026-07-22T00:33:21.426253+00:00",
+  "hostname": "bn-jfrounjian-mac",
+  "operating_system": {
+    "id": null,
+    "name": null,
+    "pretty_name": null,
+    "version_id": null,
+    "version": null,
+    "version_codename": null
+  },
+  "kernel": {
+    "release": "20.6.0",
+    "version": "Darwin Kernel Version 20.6.0: Thu Jul  6 22:12:47 PDT 2023; root:xnu-7195.141.49.702.12~1/RELEASE_X86_64",
+    "machine": "x86_64",
+    "command_line": "",
+    "build_path": "/lib/modules/20.6.0/build",
+    "build_path_exists": false
+  },
+  "glibc": {
+    "platform_libc_name": null,
+    "platform_libc_version": null,
+    "getconf_result": {
+      "command": [
+        "getconf",
+        "GNU_LIBC_VERSION"
+      ],
+      "available": true,
+      "exit_code": 64,
+      "stdout": "",
+      "stderr": "getconf: no such configuration parameter `GNU_LIBC_VERSION'"
+    }
+  },
+  "boot": {
+    "boot_id": null,
+    "uptime_seconds": null,
+    "booted_at_utc": null
+  },
+  "loaded_modules": {
+    "total_count": 0,
+    "relevant_module_names": []
+  },
+  "virtualization": {
+    "environment_type": "unknown",
+    "systemd_detect_virt": {
+      "command": [
+        "systemd-detect-virt"
+      ],
+      "available": false,
+      "exit_code": null,
+      "stdout": "",
+      "stderr": "command not available"
+    },
+    "systemd_detect_vm": {
+      "command": [
+        "systemd-detect-virt",
+        "--vm"
+      ],
+      "available": false,
+      "exit_code": null,
+      "stdout": "",
+      "stderr": "command not available"
+    },
+    "systemd_detect_container": {
+      "command": [
+        "systemd-detect-virt",
+        "--container"
+      ],
+      "available": false,
+      "exit_code": null,
+      "stdout": "",
+      "stderr": "command not available"
+    },
+    "lscpu_virtualization_fields": []
+  },
+  "iommu": {
+    "kernel_parameters": [],
+    "group_count": 0,
+    "groups_observed": false
+  },
+  "notes": [
+    "/etc/os-release was not readable.",
+    "/proc/cmdline was not readable.",
+    "/proc/modules was not readable."
+  ]
+}

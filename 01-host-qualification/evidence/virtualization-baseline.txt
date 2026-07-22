@@ -1,0 +1,6 @@
+environment_type=unknown
+systemd_detect_virt=none
+systemd_detect_vm=none
+systemd_detect_container=none
+iommu_kernel_parameters=none
+iommu_group_count=0

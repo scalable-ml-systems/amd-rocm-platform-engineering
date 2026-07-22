@@ -26,3 +26,18 @@ This phase qualifies the node.
 
 It does not perform HIP optimization, RCCL benchmarking,
 inference serving, or Kubernetes deployment.
+
+## Step 1.3 — Linux, Kernel, and Virtualization Baseline
+
+The host operating-system and kernel environment is captured
+before driver-health evaluation.
+
+Evidence:
+
+- `evidence/linux-baseline.json`
+- `evidence/kernel-command-line.txt`
+- `evidence/loaded-modules.txt`
+- `evidence/virtualization-baseline.txt`
+
+This step records virtualization and IOMMU signals but does not
+independently declare the node supported or unsupported.
