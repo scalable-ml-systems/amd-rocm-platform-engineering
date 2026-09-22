@@ -52,3 +52,28 @@ This VM is suitable for:
 
 Multi-GPU XGMI/RCCL and RDMA experiments require
 a separate multi-GPU environment.
+
+```
+
+AMD Developer Cloud VM
+│
+├── CPU
+│   └── 20 vCPU
+│       └── NUMA node 0 only
+│
+├── MI300X VF — gfx942
+│   ├── 304 CUs
+│   ├── 8 XCCs
+│   ├── SPX
+│   │   └── all 8 XCCs presented as ONE logical GPU
+│   ├── NPS1
+│   │   └── all 8 HBM stacks form ONE unified memory domain
+│   ├── ~192 GiB HBM
+│   └── reported theoretical HBM max: 5.325 TB/s
+│
+└── Network
+    ├── Virtio NIC #1
+    ├── Virtio NIC #2
+    └── NO exposed RDMA / InfiniBand device
+
+```
