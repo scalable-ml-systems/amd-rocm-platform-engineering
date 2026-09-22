@@ -40,19 +40,16 @@ empirical MI300X roofline.
 ### AMD001-S1-ROOFLINE-R1
 
 Result: PASS
+GPU: MI300X VF, SPX/NPS1
+ROCm: 10.0.0
+Profiler: 3.8.0
 
-ROCm Compute Profiler: 3.8.0
-Environment override: ROCM_VER=10.0.0
+Empirical ceilings:
+- HBM: 4,204.12 GB/s
+- BF16 MFMA: 1,028,779.69 GFLOP/s
+- FP8 MFMA: 1,867,019.53 GFLOP/s
 
-Measured:
-- MFMA BF16: 1.029 PFLOP/s
-- MFMA FP8: 1.867 PFLOP/s
-- LDS bandwidth: 76.17 TB/s
-- HBM bandwidth: pending CSV inspection
+Issue: Missing ROCm version metadata.
+Resolution: ROCM_VER=10.0.0
 
-Issue: Initial ROCm version detection failed.
-Resolved with ROCM_VER=10.0.0.
-
-Evidence:
-roofline/workloads/MI300X-SPX-NPS1-BASELINE/
-MI300X_A1/roofline.csv
+Evidence: MI300X_A1/roofline.csv
