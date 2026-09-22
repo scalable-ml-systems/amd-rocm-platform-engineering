@@ -33,9 +33,16 @@ if [[ "${candidate}" != ${EXPECTED_ROCM_MAJOR}* ]]; then
 fi
 
 echo
-echo "===== DRY RUN ====="
-apt-get -s install "${PROFILER_PACKAGE}"
 
-echo
-echo "Dry run completed."
-echo "No packages were installed."
+if [[ "${1:---dry-run}" == "--install" ]]; then
+    echo "===== INSTALLING PINNED PROFILER ====="
+
+    apt-get install -y --no-install-recommends \
+        "${PROFILER_PACKAGE}=10.0.0-4"
+
+    dpkg-query -W \
+        -f='${Package} ${Version}\n' \
+        "${PROFILER_PACKAGE}"
+else
+    echo "Dry run complete. Nothing installed."
+fi
