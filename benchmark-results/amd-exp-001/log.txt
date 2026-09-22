@@ -1,0 +1,2 @@
+[roofline] Running roofline microbenchmark on device 0
+[roofline] Roofline data saved to /mnt/amd-scratch/amd-exp-001/roofline/workloads/MI300X-SPX-NPS1-BASELINE/MI300X_A1/roofline.csv
