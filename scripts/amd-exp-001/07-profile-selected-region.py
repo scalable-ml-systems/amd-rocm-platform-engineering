@@ -17,6 +17,7 @@ for name in ("roctxProfilerResume", "roctxProfilerPause"):
     function.restype = ctypes.c_int
 
 import torch
+import sys
 from vllm import LLM, SamplingParams
 
 document = (
@@ -25,10 +26,43 @@ document = (
     "Communication and scheduling can also limit throughput.\n"
 ) * 180
 
-messages = [{
-    "role": "user",
-    "content": f"Summarize the following technical document:\n{document}",
-}]
+workload = sys.argv[1] if len(sys.argv) > 1 else "prefill"
+
+if workload == "prefill":
+    messages = [{
+        "role": "user",
+        "content": f"Summarize the following technical document:\n{document}",
+    }]
+    min_tokens, max_tokens = 32, 64
+
+elif workload == "decode":
+    messages = [{
+        "role": "user",
+        "content": (
+            "Explain GPU memory bandwidth, KV-cache management, "
+            "continuous batching and tensor-parallel communication "
+            "in a detailed technical discussion."
+        ),
+    }]
+    min_tokens, max_tokens = 480, 512
+
+else:
+    raise ValueError(f"Unknown workload: {workload}")
+
+
+# After selecting the workload, before model initialization:
+
+if workload == "decode":
+    assert len(messages[0]["content"]) < 500, (
+        "Decode workload unexpectedly contains a long prompt"
+    )
+
+print(
+    f"Selected workload: {workload}, "
+    f"max output tokens: {max_tokens}, "
+    f"prompt: {messages[0]['content'][:100]!r}",
+    flush=True,
+)
 
 llm = LLM(
     model="Qwen/Qwen3-30B-A3B",
@@ -62,8 +96,8 @@ try:
         messages,
         sampling_params=SamplingParams(
             temperature=0,
-            min_tokens=32,
-            max_tokens=64,
+            min_tokens=min_tokens,
+            max_tokens=max_tokens,
         ),
         chat_template_kwargs={"enable_thinking": False},
         use_tqdm=False,
