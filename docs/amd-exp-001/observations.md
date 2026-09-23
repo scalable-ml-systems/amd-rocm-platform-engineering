@@ -77,3 +77,23 @@ AMD Developer Cloud VM
     └── NO exposed RDMA / InfiniBand device
 
 ```
+
+### S1 — PagedAttention kernel investigation
+
+Two PagedAttention variants were identified:
+
+- QKV MFMA16: 3,072 calls
+- Reduction: 3,072 calls
+
+Each matches 48 layers × 64 iterations.
+
+Both variants begin before the final _fwd_kernel
+completes at 151.686 ms.
+
+Finding:
+The final _fwd_kernel timestamp cannot currently
+be treated as the prefill/decode boundary.
+
+Next:
+Validate phase boundaries and compare against
+the decode-heavy workload.

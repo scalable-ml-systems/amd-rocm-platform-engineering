@@ -1,0 +1,39 @@
+{
+  "id": "chatcmpl-ad7b8c8ccc79fa71",
+  "object": "chat.completion",
+  "created": 1790114268,
+  "model": "Qwen/Qwen3-30B-A3B",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "This technical document repeatedly states that a GPU performs inference by executing matrix operations, reading model weights, and managing its KV (Key-Value) cache. It also highlights that communication and scheduling can act as bottlenecks, limiting the overall throughput. The content is repetitive, with the same sentence repeated multiple times.",
+        "refusal": null,
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "reasoning": null
+      },
+      "logprobs": null,
+      "finish_reason": "stop",
+      "stop_reason": null,
+      "token_ids": null,
+      "routed_experts": null
+    }
+  ],
+  "service_tier": null,
+  "system_fingerprint": "vllm-0.27.1.dev5+gf46a9dfe2.d20260827-794f9c92",
+  "usage": {
+    "prompt_tokens": 4700,
+    "total_tokens": 4763,
+    "completion_tokens": 63,
+    "prompt_tokens_details": null
+  },
+  "prompt_logprobs": null,
+  "prompt_token_ids": null,
+  "prompt_text": null,
+  "kv_transfer_params": null,
+  "ec_transfer_params": null,
+  "metrics": null
+}
