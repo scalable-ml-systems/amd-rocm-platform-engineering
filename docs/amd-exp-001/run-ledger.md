@@ -53,3 +53,14 @@ Issue: Missing ROCm version metadata.
 Resolution: ROCM_VER=10.0.0
 
 Evidence: MI300X_A1/roofline.csv
+
+---
+
+### FAILURE 
+E0923 01:12:46.171981     373 rocattach.cpp:358] [rocprofiler-sdk-rocattach] Cannot attach to process 185: 'rocp-bg-attach' thread not found. The target process does not appear to have attach support enabled. Start the target with ROCP_TOOL_ATTACH=1, or use a rocprofiler-register build configured with ROCPROFILER_REGISTER_BUILD_DEFAULT_ATTACHMENT=ON.
+E0923 01:12:46.171984     373 rocattach.cpp:576] [rocprofiler-sdk-rocattach] rocattach_attach_tree failed for pid 185 with error code 1, continuing with remaining processes
+
+Error : The ROCm profiler cannot attach to EngineCore because the required rocp-bg-attach thread is absent.
+Even though ROCP_TOOL_ATTACH=1 was set when the container started, that setting hasn't enabled attachment in the process executing our model. This is a profiler-initialization problem, not a vLLM inference failure.
+
+Solution : we'll use a dedicated profiling process and launch the workload under rocprofv3 from the beginning.
