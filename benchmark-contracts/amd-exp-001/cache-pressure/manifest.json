@@ -1,0 +1,18 @@
+{
+  "experiment": "AMD-EXP-001",
+  "workload": "cache-pressure",
+  "schema_version": 1,
+  "documents": {
+    "hot": 8,
+    "cold": 8,
+    "target_characters_each": 36000
+  },
+  "questions_per_document": 4,
+  "generation": {
+    "max_output_tokens": 128,
+    "thinking": false
+  },
+  "important_note": "Character length is frozen here. Exact model token counts must be measured during cache-capacity calibration.",
+  "documents_sha256": "c3d842aa3b44a8833e202a23309ad1a20a0bdf4d62c65cfb7a5a5922c3f207bc",
+  "requests_sha256": "dafbba91cf781767b5e2251cd582b723b203a15ef174763bbfc60cbbc65dcc7b"
+}

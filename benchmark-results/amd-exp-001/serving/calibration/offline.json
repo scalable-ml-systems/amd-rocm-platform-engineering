@@ -1,0 +1,702 @@
+{
+  "experiment": "AMD-EXP-001",
+  "purpose": "offline-cache-budget-planning",
+  "tokenizer_snapshot": "/Users/Jack_Frounjian/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B/snapshots/ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "tokenizer_revision": "ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "contract_sha256": "dafbba91cf781767b5e2251cd582b723b203a15ef174763bbfc60cbbc65dcc7b",
+  "assumptions": {
+    "max_model_len": 8192,
+    "max_output_tokens": 128,
+    "concurrency": 2,
+    "cache_block_size_for_planning": 16,
+    "kv_dtype": "BF16",
+    "kv_bytes_per_token": 98304,
+    "note": "Memory estimates omit allocator overhead and engine-specific reservations."
+  },
+  "all_requests_fit": true,
+  "documents": {
+    "hot-01": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-02": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-03": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-04": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-05": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-06": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-07": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "hot-08": {
+      "class": "hot",
+      "document_tokens": 6992,
+      "shared_prefix_tokens": 6997,
+      "estimated_reusable_tokens": 6992
+    },
+    "cold-01": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-02": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-03": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-04": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-05": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-06": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-07": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    },
+    "cold-08": {
+      "class": "cold",
+      "document_tokens": 6979,
+      "shared_prefix_tokens": 6984,
+      "estimated_reusable_tokens": 6976
+    }
+  },
+  "requests": [
+    {
+      "request_id": "req-0001",
+      "document_id": "hot-01",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0002",
+      "document_id": "hot-01",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0003",
+      "document_id": "hot-01",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0004",
+      "document_id": "hot-01",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0005",
+      "document_id": "hot-02",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0006",
+      "document_id": "hot-02",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0007",
+      "document_id": "hot-02",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0008",
+      "document_id": "hot-02",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0009",
+      "document_id": "hot-03",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0010",
+      "document_id": "hot-03",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0011",
+      "document_id": "hot-03",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0012",
+      "document_id": "hot-03",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0013",
+      "document_id": "hot-04",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0014",
+      "document_id": "hot-04",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0015",
+      "document_id": "hot-04",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0016",
+      "document_id": "hot-04",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0017",
+      "document_id": "hot-05",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0018",
+      "document_id": "hot-05",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0019",
+      "document_id": "hot-05",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0020",
+      "document_id": "hot-05",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0021",
+      "document_id": "hot-06",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0022",
+      "document_id": "hot-06",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0023",
+      "document_id": "hot-06",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0024",
+      "document_id": "hot-06",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0025",
+      "document_id": "hot-07",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0026",
+      "document_id": "hot-07",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0027",
+      "document_id": "hot-07",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0028",
+      "document_id": "hot-07",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0029",
+      "document_id": "hot-08",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0030",
+      "document_id": "hot-08",
+      "class": "hot",
+      "prompt_tokens": 7022,
+      "max_output_tokens": 128,
+      "total_tokens": 7150,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0031",
+      "document_id": "hot-08",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0032",
+      "document_id": "hot-08",
+      "class": "hot",
+      "prompt_tokens": 7021,
+      "max_output_tokens": 128,
+      "total_tokens": 7149,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0033",
+      "document_id": "cold-01",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0034",
+      "document_id": "cold-01",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0035",
+      "document_id": "cold-01",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0036",
+      "document_id": "cold-01",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0037",
+      "document_id": "cold-02",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0038",
+      "document_id": "cold-02",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0039",
+      "document_id": "cold-02",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0040",
+      "document_id": "cold-02",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0041",
+      "document_id": "cold-03",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0042",
+      "document_id": "cold-03",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0043",
+      "document_id": "cold-03",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0044",
+      "document_id": "cold-03",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0045",
+      "document_id": "cold-04",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0046",
+      "document_id": "cold-04",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0047",
+      "document_id": "cold-04",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0048",
+      "document_id": "cold-04",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0049",
+      "document_id": "cold-05",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0050",
+      "document_id": "cold-05",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0051",
+      "document_id": "cold-05",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0052",
+      "document_id": "cold-05",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0053",
+      "document_id": "cold-06",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0054",
+      "document_id": "cold-06",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0055",
+      "document_id": "cold-06",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0056",
+      "document_id": "cold-06",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0057",
+      "document_id": "cold-07",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0058",
+      "document_id": "cold-07",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0059",
+      "document_id": "cold-07",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0060",
+      "document_id": "cold-07",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0061",
+      "document_id": "cold-08",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0062",
+      "document_id": "cold-08",
+      "class": "cold",
+      "prompt_tokens": 7009,
+      "max_output_tokens": 128,
+      "total_tokens": 7137,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0063",
+      "document_id": "cold-08",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    },
+    {
+      "request_id": "req-0064",
+      "document_id": "cold-08",
+      "class": "cold",
+      "prompt_tokens": 7008,
+      "max_output_tokens": 128,
+      "total_tokens": 7136,
+      "fits_context": true
+    }
+  ],
+  "planning": {
+    "hot_reusable_prefix_tokens": 55936,
+    "cold_reusable_prefix_tokens": 55808,
+    "largest_request_including_output": 7150,
+    "minimum_hot_plus_active_tokens": 70236,
+    "candidate_cache_budget_tokens": 77264,
+    "candidate_cache_gib_bf16": 7.07,
+    "hot_plus_cold_exceeds_budget": true
+  }
+}
