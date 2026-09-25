@@ -4,6 +4,7 @@ set -euo pipefail
 
 ENGINE="${2:-}"
 CACHE_MODE="${3:-off}"
+CACHE_TOKENS="${4:-}"
 
 REPO="/root/amd-rocm-platform-engineering"
 MODEL_CACHE="/root/amd-model-cache"
@@ -139,6 +140,23 @@ if [[ "$ENGINE" == "vllm" ]]; then
         CACHE_FLAGS=(--enable-prefix-caching)
     fi
 
+    KV_FLAGS=()
+
+    if [[ -n "$CACHE_TOKENS" ]]; then
+        [[ "$CACHE_TOKENS" =~ ^[1-9][0-9]*$ ]] || {
+            echo "ERROR: Cache capacity must be a positive integer."
+            exit 1
+        }
+
+        # Qwen3-30B-A3B: 98,304 bytes per token with BF16 KV cache.
+        KV_BYTES=$((CACHE_TOKENS * 98304))
+
+        KV_FLAGS=(
+            --kv-cache-memory-bytes "$KV_BYTES"
+            --kv-cache-dtype auto
+        )
+    fi
+
     COMMAND=(
         --entrypoint vllm
         "$IMAGE"
@@ -152,6 +170,7 @@ if [[ "$ENGINE" == "vllm" ]]; then
         --gpu-memory-utilization 0.80
         --default-chat-template-kwargs '{"enable_thinking":false}'
         "${CACHE_FLAGS[@]}"
+	"${KV_FLAGS[@]}"
     )
 
 else
@@ -160,6 +179,21 @@ else
     CACHE_FLAGS=()
     if [[ "$CACHE_MODE" == "off" ]]; then
         CACHE_FLAGS=(--disable-radix-cache)
+    fi
+    
+    COMMON_DOCKER+=(--env GPU_ARCHS=gfx942)
+
+    CACHE_LIMIT_FLAGS=()
+
+    if [[ -n "$CACHE_TOKENS" ]]; then
+        if ! [[ "$CACHE_TOKENS" =~ ^[1-9][0-9]*$ ]]; then
+            echo "ERROR: Cache capacity must be a positive integer."
+            exit 1
+        fi
+
+        CACHE_LIMIT_FLAGS=(
+            --max-total-tokens "$CACHE_TOKENS"
+        )
     fi
 
     COMMAND=(
@@ -175,6 +209,7 @@ else
         --mem-fraction-static 0.80
         --enable-metrics
         "${CACHE_FLAGS[@]}"
+	"${CACHE_LIMIT_FLAGS[@]}"
     )
 fi
 
@@ -201,6 +236,7 @@ docker image inspect "$IMAGE" >/dev/null || {
 docker run "${COMMON_DOCKER[@]}" "${COMMAND[@]}"
 
 echo "Started $ENGINE (cache: $CACHE_MODE)"
+echo "requested_cache_tokens=${CACHE_TOKENS:-automatic}"
 echo "Session: $SESSION"
 echo "API: http://127.0.0.1:$PORT"
 echo "Run 10-smoke-test.py before sending workloads."

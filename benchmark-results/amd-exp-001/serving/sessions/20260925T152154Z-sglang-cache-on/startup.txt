@@ -1,0 +1,10 @@
+engine=sglang
+cache_mode=on
+model=Qwen/Qwen3-30B-A3B
+model_revision=ad44e777bcd18fa416d9da3bd8f70d33ebb85d39
+image=rocm/sgl-dev:v0.5.15.post1-ubuntu24.04-py3.14-rocm10.0.0
+image_id=sha256:13171073ebf66fee0a1473d43ae8080cc7f8500fa213ddf1507f158fbb6dd63a
+max_context_tokens=8192
+gpu_memory_setting=0.80
+started_utc=2026-09-25T15:21:54Z
+command=--entrypoint python3 rocm/sgl-dev:v0.5.15.post1-ubuntu24.04-py3.14-rocm10.0.0 -m sglang.launch_server --model-path /app/models/hub/models--Qwen--Qwen3-30B-A3B/snapshots/ad44e777bcd18fa416d9da3bd8f70d33ebb85d39 --host 127.0.0.1 --port 8000 --tp 1 --dtype bfloat16 --context-length 8192 --mem-fraction-static 0.80 --enable-metrics --max-total-tokens 80000 

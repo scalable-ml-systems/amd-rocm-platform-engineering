@@ -1,0 +1,7 @@
+{
+  "engine": "sglang",
+  "base_url": "http://127.0.0.1:8000",
+  "timestamp_utc": "20260925T140704Z",
+  "expected_model": "Qwen3-30B-A3B",
+  "status": "FAIL"
+}
