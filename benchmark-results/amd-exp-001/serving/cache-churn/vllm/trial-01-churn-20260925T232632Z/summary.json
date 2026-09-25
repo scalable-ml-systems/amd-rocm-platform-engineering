@@ -1,0 +1,70 @@
+{
+  "phases": {
+    "warm_hot": {
+      "completed_requests": 8,
+      "median_ttft_ms": 271.255,
+      "mean_ttft_ms": 334.332,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "prefix_hit_tokens_delta": 0.0,
+        "prefix_query_tokens_delta": 56168.0,
+        "prefix_hit_fraction": 0.0,
+        "kv_cache_usage_after": 0.0,
+        "method": "phase counter differences, if exposed"
+      }
+    },
+    "baseline_hot": {
+      "completed_requests": 8,
+      "median_ttft_ms": 55.694,
+      "mean_ttft_ms": 56.118,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "prefix_hit_tokens_delta": 55936.0,
+        "prefix_query_tokens_delta": 56176.0,
+        "prefix_hit_fraction": 0.995727712902307,
+        "kv_cache_usage_after": 0.0,
+        "method": "phase counter differences, if exposed"
+      }
+    },
+    "pressure": {
+      "completed_requests": 8,
+      "median_ttft_ms": 271.625,
+      "mean_ttft_ms": 271.563,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "prefix_hit_tokens_delta": 0.0,
+        "prefix_query_tokens_delta": 56064.0,
+        "prefix_hit_fraction": 0.0,
+        "kv_cache_usage_after": 0.0,
+        "method": "phase counter differences, if exposed"
+      }
+    },
+    "probe_hot": {
+      "completed_requests": 1,
+      "median_ttft_ms": 271.994,
+      "mean_ttft_ms": 271.994,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "prefix_hit_tokens_delta": 0.0,
+        "prefix_query_tokens_delta": 7021.0,
+        "prefix_hit_fraction": 0.0,
+        "kv_cache_usage_after": 0.0,
+        "method": "phase counter differences, if exposed"
+      }
+    }
+  },
+  "probe_comparison": {
+    "document_id": "hot-01",
+    "baseline_ttft_ms": 55.27,
+    "probe_ttft_ms": 271.994,
+    "probe_to_baseline_ttft_ratio": 4.921,
+    "baseline_cached_tokens": null,
+    "probe_cached_tokens": null
+  },
+  "interpretation": "One fresh-engine trial is not proof of eviction or an eviction policy. Compare control and churn across independent repetitions. Check baseline cache reuse and cache telemetry before attributing any latency change to eviction.",
+  "cache_telemetry_present": true
+}
