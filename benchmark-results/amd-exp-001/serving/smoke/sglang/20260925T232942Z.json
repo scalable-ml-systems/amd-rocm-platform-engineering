@@ -1,0 +1,60 @@
+{
+  "engine": "sglang",
+  "base_url": "http://127.0.0.1:8000",
+  "timestamp_utc": "20260925T232942Z",
+  "expected_model": "Qwen3-30B-A3B",
+  "status": "PASS",
+  "advertised_model": "/app/models/hub/models--Qwen--Qwen3-30B-A3B/snapshots/ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+  "request": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply with exactly READY. No explanation."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 24,
+    "stream": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "model": "/app/models/hub/models--Qwen--Qwen3-30B-A3B/snapshots/ad44e777bcd18fa416d9da3bd8f70d33ebb85d39"
+  },
+  "result": {
+    "answer": "READY",
+    "input_tokens": 20,
+    "output_tokens": 2,
+    "finish_reason": "stop"
+  },
+  "elapsed_seconds": 115.424,
+  "raw_response": {
+    "id": "2cb5e73640584a7f847cf6f128db8e99",
+    "object": "chat.completion",
+    "created": 1790379332,
+    "model": "/app/models/hub/models--Qwen--Qwen3-30B-A3B/snapshots/ad44e777bcd18fa416d9da3bd8f70d33ebb85d39",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "READY",
+          "reasoning_content": null,
+          "tool_calls": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "matched_stop": 151645
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 20,
+      "total_tokens": 22,
+      "completion_tokens": 2,
+      "prompt_tokens_details": null,
+      "reasoning_tokens": 0
+    },
+    "metadata": {
+      "weight_version": "default"
+    }
+  }
+}

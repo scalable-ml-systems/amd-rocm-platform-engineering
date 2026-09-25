@@ -1,0 +1,62 @@
+{
+  "phases": {
+    "warm_hot": {
+      "completed_requests": 8,
+      "median_ttft_ms": 183.222,
+      "mean_ttft_ms": 195.123,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "reported_cache_hit_rate_after": 0.0,
+        "token_usage_after": 0.09,
+        "method": "SGLang gauges are point-in-time diagnostics, NOT a phase hit ratio. Prefer per-request cached tokens when available."
+      }
+    },
+    "baseline_hot": {
+      "completed_requests": 8,
+      "median_ttft_ms": 67.688,
+      "mean_ttft_ms": 68.369,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "reported_cache_hit_rate_after": 0.0,
+        "token_usage_after": 0.09,
+        "method": "SGLang gauges are point-in-time diagnostics, NOT a phase hit ratio. Prefer per-request cached tokens when available."
+      }
+    },
+    "pressure": {
+      "completed_requests": 8,
+      "median_ttft_ms": 184.263,
+      "mean_ttft_ms": 184.286,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "reported_cache_hit_rate_after": 0.0,
+        "token_usage_after": 0.09,
+        "method": "SGLang gauges are point-in-time diagnostics, NOT a phase hit ratio. Prefer per-request cached tokens when available."
+      }
+    },
+    "probe_hot": {
+      "completed_requests": 1,
+      "median_ttft_ms": 185.414,
+      "mean_ttft_ms": 185.414,
+      "mean_cached_prompt_tokens_when_reported": null,
+      "requests_with_cached_token_report": 0,
+      "server_metrics": {
+        "reported_cache_hit_rate_after": 0.0,
+        "token_usage_after": 0.09,
+        "method": "SGLang gauges are point-in-time diagnostics, NOT a phase hit ratio. Prefer per-request cached tokens when available."
+      }
+    }
+  },
+  "probe_comparison": {
+    "document_id": "hot-01",
+    "baseline_ttft_ms": 67.748,
+    "probe_ttft_ms": 185.414,
+    "probe_to_baseline_ttft_ratio": 2.737,
+    "baseline_cached_tokens": null,
+    "probe_cached_tokens": null
+  },
+  "interpretation": "One fresh-engine trial is not proof of eviction or an eviction policy. Compare control and churn across independent repetitions. Check baseline cache reuse and cache telemetry before attributing any latency change to eviction.",
+  "cache_telemetry_present": false
+}
