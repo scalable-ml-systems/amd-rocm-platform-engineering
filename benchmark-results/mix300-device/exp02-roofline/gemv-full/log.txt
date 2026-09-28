@@ -1,0 +1,131 @@
+Rocprofiler-Compute version: 3.8.0
+Profiler choice: rocprofiler-sdk
+Output directory: /root/amd-rocm-platform-engineering/benchmark-results/mix300-device/exp02-roofline/gemv-full
+Target: MI300X_A1
+Command: ./scripts/mix300-device/route-a-gemv 8192
+Kernel Selection: ['bf16_matvec']
+Dispatch Selection: None
+Filtered sections: ['4']
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Collecting Performance Counters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using native collector: /opt/rocm/core-10.0/lib/rocprofiler-compute/librocprofiler-compute-tool.so
+Using native counter collection tool: /opt/rocm/core-10.0/lib/rocprofiler-compute/librocprofiler-compute-tool.so
+[profiling] Iteration multiplexing: Disabled
+[Run 1/3][Approximate profiling time left: pending first measurement...]
+[profiling] Current input file: benchmark-results/mix300-device/exp02-roofline/gemv-full/perfmon/pmc_perf_0.yaml
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [rocprofiler_configure] (priority=1) is using rocprofiler-sdk v1.3.5 (1.3.5)
+   |-> [rocprofiler-sdk] W0928 17:09:33.925447    7246 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.152218 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool init
+   |-> [rocprofiler-sdk] W0928 17:09:33.979250    7246 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:33.991610    7246 tool.cpp:3348] HSA version 1.21.0 initialized (instance=0)
+   |-> [rocprofiler-sdk] DEVICE AMD Instinct MI300X VF  ARCH gfx942:sramecc+:xnack-  CUs 304  WAVEFRONT 64
+   |-> [rocprofiler-sdk] W0928 17:09:34.222967    7246 queue_controller.cpp:170] [queue-intercept] device-memory ring-buffer requested but profiling requires system-memory InterceptQueue; falling back to system-memory ring for agent 106349494266176 (priority and CU-mask from the descriptor are not preserved)
+   |-> [rocprofiler-sdk] LAUNCH grid=8192 blocks, block=256 threads, wavefronts/block=4
+   |-> [rocprofiler-sdk] PASS rows=8192 cols=4096 max_abs_error=0
+   |-> [rocprofiler-sdk] EXAMPLE row0: GPU=2 CPU=2
+   |-> [rocprofiler-sdk] W0928 17:09:34.306748    7246 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.327498 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.319357    7246 generateRocpd.cpp:1062] writing SQL database for process 7246 on node 3484309456
+   |-> [rocprofiler-sdk] E0928 17:09:34.320101    7246 generateRocpd.cpp:1086] Opened result file: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/snapshots-gpu-mi300x1-192gb-devcloud-atl1/7246_results.db (UUID=000000c3-4d77-7d77-8d71-60c01567edc9)
+   |-> [rocprofiler-sdk] W0928 17:09:34.397936    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_string             ::     0.002499 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.397986    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_node          ::     0.000003 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.398406    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_process       ::     0.000413 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.399200    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_agent         ::     0.000781 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.412841    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc           ::     0.013630 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.413796    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd kernel info        ::     0.000937 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.413833    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_region             ::     0.000023 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.421217    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_kernel_dispatch    ::     0.007377 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.421244    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event          ::     0.000007 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.421252    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_copy        ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.421259    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_graph_launch       ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.421268    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_allocate    ::     0.000003 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.422199    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc: kfd      ::     0.000925 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.422210    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event: kfd     ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.422509    7246 simple_timer.cpp:55] SQLite3 generation :: rocpd_flush_pending      ::     0.000291 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.422880    7246 simple_timer.cpp:55] SQLite3 generation :: SQL indexing             ::     0.000359 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.424583    7246 simple_timer.cpp:55] SQLite3 generation :: total                    ::     0.105230 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.426062    7246 simple_timer.cpp:55] [rocprofv3] output generation ::     0.118629 sec
+   |-> [rocprofiler-sdk] W0928 17:09:34.426096    7246 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.119322 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool fini
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [write_counters] Counter collection data has been written to: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/7246_native_counter_collection.csv
+Intermediate results_*.csv generation from rocpd databases is deprecated and will be replaced with automatic .db file retention in a future release.
+[Run 2/3][Approximate profiling time left: 2 seconds]...
+[profiling] Current input file: benchmark-results/mix300-device/exp02-roofline/gemv-full/perfmon/pmc_perf_1.yaml
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [rocprofiler_configure] (priority=1) is using rocprofiler-sdk v1.3.5 (1.3.5)
+   |-> [rocprofiler-sdk] W0928 17:09:36.549489    7255 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.149059 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool init
+   |-> [rocprofiler-sdk] W0928 17:09:36.604195    7255 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:36.616280    7255 tool.cpp:3348] HSA version 1.21.0 initialized (instance=0)
+   |-> [rocprofiler-sdk] DEVICE AMD Instinct MI300X VF  ARCH gfx942:sramecc+:xnack-  CUs 304  WAVEFRONT 64
+   |-> [rocprofiler-sdk] W0928 17:09:36.847047    7255 queue_controller.cpp:170] [queue-intercept] device-memory ring-buffer requested but profiling requires system-memory InterceptQueue; falling back to system-memory ring for agent 106315155002048 (priority and CU-mask from the descriptor are not preserved)
+   |-> [rocprofiler-sdk] LAUNCH grid=8192 blocks, block=256 threads, wavefronts/block=4
+   |-> [rocprofiler-sdk] PASS rows=8192 cols=4096 max_abs_error=0
+   |-> [rocprofiler-sdk] EXAMPLE row0: GPU=2 CPU=2
+   |-> [rocprofiler-sdk] W0928 17:09:36.925635    7255 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.321440 sec
+   |-> [rocprofiler-sdk] W0928 17:09:36.937751    7255 generateRocpd.cpp:1062] writing SQL database for process 7255 on node 3484309456
+   |-> [rocprofiler-sdk] E0928 17:09:36.938450    7255 generateRocpd.cpp:1086] Opened result file: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/snapshots-gpu-mi300x1-192gb-devcloud-atl1/7255_results.db (UUID=000000c3-57bc-77bc-b7ea-98c284a05b20)
+   |-> [rocprofiler-sdk] W0928 17:09:36.998232    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_string             ::     0.002292 sec
+   |-> [rocprofiler-sdk] W0928 17:09:36.998276    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_node          ::     0.000003 sec
+   |-> [rocprofiler-sdk] W0928 17:09:36.998635    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_process       ::     0.000354 sec
+   |-> [rocprofiler-sdk] W0928 17:09:36.999300    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_agent         ::     0.000652 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.006989    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc           ::     0.007679 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.007938    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd kernel info        ::     0.000931 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.007971    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_region             ::     0.000020 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.014295    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_kernel_dispatch    ::     0.006317 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.014321    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event          ::     0.000008 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.014329    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_copy        ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.014336    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_graph_launch       ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.014345    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_allocate    ::     0.000004 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.015191    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc: kfd      ::     0.000841 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.015202    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event: kfd     ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.015475    7255 simple_timer.cpp:55] SQLite3 generation :: rocpd_flush_pending      ::     0.000266 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.015813    7255 simple_timer.cpp:55] SQLite3 generation :: SQL indexing             ::     0.000324 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.017325    7255 simple_timer.cpp:55] SQLite3 generation :: total                    ::     0.079577 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.018754    7255 simple_timer.cpp:55] [rocprofv3] output generation ::     0.092456 sec
+   |-> [rocprofiler-sdk] W0928 17:09:37.018783    7255 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.093120 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool fini
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [write_counters] Counter collection data has been written to: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/7255_native_counter_collection.csv
+Intermediate results_*.csv generation from rocpd databases is deprecated and will be replaced with automatic .db file retention in a future release.
+[Run 3/3][Approximate profiling time left: 0 seconds]...
+[profiling] Current input file: benchmark-results/mix300-device/exp02-roofline/gemv-full/perfmon/pmc_perf_2.yaml
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [rocprofiler_configure] (priority=1) is using rocprofiler-sdk v1.3.5 (1.3.5)
+   |-> [rocprofiler-sdk] W0928 17:09:39.114073    7264 simple_timer.cpp:55] [rocprofv3] tool initialization ::     0.148655 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool init
+   |-> [rocprofiler-sdk] W0928 17:09:39.163640    7264 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.177039    7264 tool.cpp:3348] HSA version 1.21.0 initialized (instance=0)
+   |-> [rocprofiler-sdk] DEVICE AMD Instinct MI300X VF  ARCH gfx942:sramecc+:xnack-  CUs 304  WAVEFRONT 64
+   |-> [rocprofiler-sdk] W0928 17:09:39.400543    7264 queue_controller.cpp:170] [queue-intercept] device-memory ring-buffer requested but profiling requires system-memory InterceptQueue; falling back to system-memory ring for agent 111253323628160 (priority and CU-mask from the descriptor are not preserved)
+   |-> [rocprofiler-sdk] LAUNCH grid=8192 blocks, block=256 threads, wavefronts/block=4
+   |-> [rocprofiler-sdk] PASS rows=8192 cols=4096 max_abs_error=0
+   |-> [rocprofiler-sdk] EXAMPLE row0: GPU=2 CPU=2
+   |-> [rocprofiler-sdk] W0928 17:09:39.480117    7264 simple_timer.cpp:55] [rocprofv3] './scripts/mix300-device/route-a-gemv 8192' ::     0.316477 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.491850    7264 generateRocpd.cpp:1062] writing SQL database for process 7264 on node 3484309456
+   |-> [rocprofiler-sdk] E0928 17:09:39.492549    7264 generateRocpd.cpp:1086] Opened result file: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/snapshots-gpu-mi300x1-192gb-devcloud-atl1/7264_results.db (UUID=000000c3-61c2-71c2-af8f-7b888dc2e348)
+   |-> [rocprofiler-sdk] W0928 17:09:39.552784    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_string             ::     0.002565 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.552832    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_node          ::     0.000003 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.553241    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_process       ::     0.000403 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.554002    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_agent         ::     0.000746 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.559030    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc           ::     0.005019 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.560044    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd kernel info        ::     0.000995 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.560084    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_region             ::     0.000026 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566053    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_kernel_dispatch    ::     0.005961 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566080    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event          ::     0.000007 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566088    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_copy        ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566095    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_graph_launch       ::     0.000002 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566104    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_memory_allocate    ::     0.000004 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566882    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_info_pmc: kfd      ::     0.000773 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.566893    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_pmc_event: kfd     ::     0.000000 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.567201    7264 simple_timer.cpp:55] SQLite3 generation :: rocpd_flush_pending      ::     0.000298 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.567565    7264 simple_timer.cpp:55] SQLite3 generation :: SQL indexing             ::     0.000352 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.569052    7264 simple_timer.cpp:55] SQLite3 generation :: total                    ::     0.077206 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.570388    7264 simple_timer.cpp:55] [rocprofv3] output generation ::     0.089640 sec
+   |-> [rocprofiler-sdk] W0928 17:09:39.570417    7264 simple_timer.cpp:55] [rocprofv3] tool finalization ::     0.090279 sec
+   |-> [rocprofiler-sdk] [rocprofiler-compute] In tool fini
+   |-> [rocprofiler-sdk] [rocprofiler-compute] [write_counters] Counter collection data has been written to: benchmark-results/mix300-device/exp02-roofline/gemv-full/out/pmc_1/7264_native_counter_collection.csv
+Intermediate results_*.csv generation from rocpd databases is deprecated and will be replaced with automatic .db file retention in a future release.
+PC sampling data collection skipped as --pc-sampling is not specified.
+[roofline] Checking for roofline.csv in benchmark-results/mix300-device/exp02-roofline/gemv-full
+[roofline] Roofline data saved to benchmark-results/mix300-device/exp02-roofline/gemv-full/roofline.csv
+  Run 'rocprof-compute analyze -p benchmark-results/mix300-device/exp02-roofline/gemv-full' for charts

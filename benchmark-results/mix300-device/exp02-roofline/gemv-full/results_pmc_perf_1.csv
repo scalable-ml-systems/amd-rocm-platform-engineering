@@ -1,0 +1,11 @@
+GPU_ID,GUID,Correlation_Id,Dispatch_ID,Grid_Size,Workgroup_Size,LDS_Per_Workgroup,Scratch_Per_Workitem,Arch_VGPR,Accum_VGPR,SGPR,Kernel_Name,Start_Timestamp,End_Timestamp,Kernel_ID,Counter_Name,Counter_Value
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MFMA_MOPS_F32,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MFMA_MOPS_F64,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MFMA_MOPS_F8,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MFMA_MOPS_I8,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MUL_F16,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MUL_F32,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_MUL_F64,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,SQ_INSTS_VALU_TRANS_F16,0.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,TCC_EA0_WRREQ_sum,4096.0
+1,000000c3-57bc-77bc-b7ea-98c284a05b20,2,0,2097152,256,1024,0,12,4,32,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",12802511644028,12802511682035,0,TCP_TOTAL_CACHE_ACCESSES_sum,4333570.0

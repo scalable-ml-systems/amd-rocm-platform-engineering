@@ -1,0 +1,2 @@
+Dispatch_ID,Kernel_Name,GPU_ID
+0,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",0

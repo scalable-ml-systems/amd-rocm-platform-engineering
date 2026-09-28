@@ -1,0 +1,2 @@
+Kernel_Name,Count,Sum(ns),Mean(ns),Median(ns),Percent
+"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",1,37846.0,37846.0,37846.0,100.0

@@ -1,0 +1,42 @@
+attach_duration_msec: null
+attach_pid: null
+bench_only: false
+config_dir: /opt/rocm/core-10.0/libexec/rocprofiler-compute/rocprof_compute_soc/analysis_configs
+device: 0
+dispatch: null
+experimental: false
+filter_blocks:
+- '4'
+format_rocprof_output: rocpd
+iteration_multiplexing: null
+join_type: grid
+kernel:
+- bf16_matvec
+kokkos_trace: false
+list_available_metrics: false
+list_blocks: null
+list_metrics: null
+list_sets: false
+loglevel: 20
+membw_analysis: false
+ml_api_trace: false
+mode: profile
+name: null
+no_native_tool: false
+no_roof: true
+output_directory: benchmark-results/mix300-device/exp02-roofline/gemv
+overwrite: false
+pc_sampling: false
+pc_sampling_interval: null
+pc_sampling_method: stochastic
+quiet: false
+remaining: ./scripts/mix300-device/route-a-gemv 8192
+retain_rocpd_output: false
+rocprofiler_sdk_tool_path: /opt/rocm/lib/rocprofiler-sdk/librocprofiler-sdk-tool.so
+roof_only: false
+set_selected: null
+specs: false
+target: null
+torch_trace: false
+triton_trace: false
+verbose: 0
