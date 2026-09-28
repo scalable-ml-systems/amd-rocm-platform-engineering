@@ -1,0 +1,3 @@
+"Kind","Agent_Id","Queue_Id","Stream_Id","Thread_Id","Dispatch_Id","Kernel_Id","Kernel_Name","Correlation_Id","Start_Timestamp","End_Timestamp","LDS_Block_Size","Scratch_Size","VGPR_Count","Accum_VGPR_Count","SGPR_Count","Workgroup_Size_X","Workgroup_Size_Y","Workgroup_Size_Z","Grid_Size_X","Grid_Size_Y","Grid_Size_Z"
+"KERNEL_DISPATCH","Agent 1",1,0,5304,1,7,"__amd_rocclr_copyBuffer",1,9748484569825,9748484575478,0,0,16,0,32,512,1,1,512,1,1
+"KERNEL_DISPATCH","Agent 1",1,0,5304,2,14,"bf16_matvec(__hip_bfloat16 const*, __hip_bfloat16 const*, float*, int)",2,9748485238413,9748485275217,1024,0,12,4,32,256,1,1,2097152,1,1

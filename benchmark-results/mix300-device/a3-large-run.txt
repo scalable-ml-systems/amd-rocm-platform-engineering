@@ -1,0 +1,4 @@
+DEVICE AMD Instinct MI300X VF  ARCH gfx942:sramecc+:xnack-  CUs 304  WAVEFRONT 64
+LAUNCH grid=8192 blocks, block=256 threads, wavefronts/block=4
+PASS rows=8192 cols=4096 max_abs_error=0
+EXAMPLE row0: GPU=2 CPU=2

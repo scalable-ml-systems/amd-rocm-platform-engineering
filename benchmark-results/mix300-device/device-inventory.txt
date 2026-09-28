@@ -1,0 +1,39 @@
+===== GPU =====
+GPU: 0
+    ASIC:
+        MARKET_NAME: AMD Instinct MI300X VF
+        VENDOR_ID: 0x1002
+        VENDOR_NAME: Advanced Micro Devices Inc. [AMD/ATI]
+        SUBVENDOR_ID: 0x1002
+        DEVICE_ID: 0x74b5
+        SUBSYSTEM_ID: 0x74a1
+        REV_ID: 0x00
+        ASIC_SERIAL: 0xC7E653656C4F4E0B
+        OAM_ID: 3
+        NUM_COMPUTE_UNITS: 304
+        TARGET_GRAPHICS_VERSION: gfx942
+        FLAGS: 258
+    VRAM:
+        TYPE: HBM
+        VENDOR: MICRON
+        SIZE: 196288 MB
+        BIT_WIDTH: 2048
+        MAX_BANDWIDTH: 5325 GB/s
+
+===== PARTITION =====
+CURRENT_PARTITION:
+GPU_ID  MEMORY  ACCELERATOR_TYPE  ACCELERATOR_PROFILE_INDEX  PARTITION_ID  
+0       NPS1    SPX               0                          0
+===== ROCm TOOLS =====
+/opt/rocm/core-10.0/bin/rocminfo
+/opt/rocm/core-10.0/bin/hipcc
+/opt/rocm/core-10.0/bin/rocprofv3
+===== GPU COMPUTE AGENT =====
+  Marketing Name:          INTEL(R) XEON(R) PLATINUM 8568Y+   
+  Compute Unit:            20                                 
+  Name:                    gfx942                             
+  Marketing Name:          AMD Instinct MI300X VF             
+  Compute Unit:            304                                
+  Wavefront Size:          64(0x40)                           
+      Name:                    amdgcn-amd-amdhsa--gfx942:sramecc+:xnack-
+      Name:                    amdgcn-amd-amdhsa--gfx9-4-generic:sramecc+:xnack-
