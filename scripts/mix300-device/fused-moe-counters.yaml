@@ -1,0 +1,7 @@
+jobs:
+  - pmc_groups:
+      - ["SQ_INSTS_VALU_MFMA_MOPS_BF16"]
+      - ["FETCH_SIZE"]
+      - ["WRITE_SIZE"]
+    pmc_group_interval: 8
+    kernel_include_regex: "^fused_moe_kernel$"
