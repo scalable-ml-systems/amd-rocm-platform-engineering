@@ -24,23 +24,27 @@ RESULTS_DIRECTORY = Path(
 )
 
 
-PREFIX_METRIC_NAMES = {
+PREFIX_CACHE_METRIC_NAMES = {
     "prefix_queries": {
-        "vllm:prefix_cache_queries_total",
         "vllm:prefix_cache_queries",
+        "vllm:prefix_cache_queries_total",
     },
     "prefix_hits": {
-        "vllm:prefix_cache_hits_total",
         "vllm:prefix_cache_hits",
+        "vllm:prefix_cache_hits_total",
     },
 }
 
 
 def build_shared_prefix() -> str:
     """
-    Create one deterministic long prefix.
+    Build one deterministic long prefix.
 
-    Both R1 and R2 use this exact text.
+    R1 and R2 use this exact prefix.
+
+    The prefix is deliberately long so that it spans many
+    full KV-cache blocks and therefore gives prefix caching
+    meaningful work to reuse.
     """
 
     repeated_context = make_approximate_token_prompt(
@@ -63,21 +67,42 @@ def build_mutated_prefix(
     shared_prefix: str,
 ) -> str:
     """
-    Change one early word.
+    Change one word near the beginning of the prefix.
 
-    Because prefix-cache block hashes depend on the preceding
-    prefix, an early change should prevent downstream blocks
-    from matching the original cached prefix.
+    Prefix-cache block hashes depend on the preceding prefix.
+
+    Therefore an early mutation should cause downstream block
+    hashes to differ from those produced by R1.
     """
 
-    return shared_prefix.replace(
+    mutated_prefix = shared_prefix.replace(
         "GPU infrastructure",
         "CPU infrastructure",
         1,
     )
 
+    if mutated_prefix == shared_prefix:
+        raise RuntimeError(
+            "Prefix mutation failed. "
+            "The expected text was not found."
+        )
+
+    return mutated_prefix
+
 
 def build_requests() -> list[RequestSpec]:
+    """
+    Three sequential cases:
+
+    R1-COLD
+        Builds the initial prefix KV state.
+
+    R2-REUSE
+        Uses the identical prefix.
+
+    R3-MUTATED
+        Changes one early word in that prefix.
+    """
 
     shared_prefix = build_shared_prefix()
 
@@ -127,11 +152,11 @@ def fetch_prefix_cache_metrics(
     """
     Read only prefix-cache counters from vLLM /metrics.
 
-    The accepted metric-name variants make this tolerant of
-    minor naming differences across vLLM releases.
+    Prometheus counters may appear using their base name
+    or with the standard "_total" suffix.
     """
 
-    metric_values = {
+    observed_metrics = {
         "prefix_queries": 0.0,
         "prefix_hits": 0.0,
     }
@@ -141,7 +166,14 @@ def fetch_prefix_cache_metrics(
         timeout=5,
     ) as response:
 
-        metrics_text = response.read().decode("utf-8")
+        metrics_text = response.read().decode(
+            "utf-8"
+        )
+
+    matched_total_metric = {
+        "prefix_queries": False,
+        "prefix_hits": False,
+    }
 
     for line in metrics_text.splitlines():
 
@@ -150,38 +182,76 @@ def fetch_prefix_cache_metrics(
         if not line or line.startswith("#"):
             continue
 
-        fields = line.split()
+        metric_fields = line.split()
 
-        if len(fields) < 2:
+        if len(metric_fields) < 2:
             continue
 
-        metric_name = fields[0].split("{", 1)[0]
+        metric_name = (
+            metric_fields[0]
+            .split("{", 1)[0]
+        )
 
         try:
-            metric_value = float(fields[1])
+            metric_value = float(
+                metric_fields[1]
+            )
         except ValueError:
             continue
 
-        for logical_name, accepted_names in (
-            PREFIX_METRIC_NAMES.items()
-        ):
-            if metric_name in accepted_names:
-                metric_values[logical_name] += metric_value
+        for (
+            logical_metric_name,
+            accepted_metric_names,
+        ) in PREFIX_CACHE_METRIC_NAMES.items():
 
-    return metric_values
+            if metric_name not in accepted_metric_names:
+                continue
+
+            is_total_metric = (
+                metric_name.endswith("_total")
+            )
+
+            if is_total_metric:
+                observed_metrics[
+                    logical_metric_name
+                ] = metric_value
+
+                matched_total_metric[
+                    logical_metric_name
+                ] = True
+
+            elif not matched_total_metric[
+                logical_metric_name
+            ]:
+                observed_metrics[
+                    logical_metric_name
+                ] = metric_value
+
+    return observed_metrics
 
 
 def calculate_metric_delta(
     metrics_before: dict[str, float],
     metrics_after: dict[str, float],
 ) -> dict[str, float]:
+    """
+    Convert cumulative server counters into evidence for
+    one specific request.
+    """
 
     return {
-        metric_name: (
-            metrics_after.get(metric_name, 0.0)
-            - metrics_before.get(metric_name, 0.0)
+        metric_name: max(
+            metrics_after.get(
+                metric_name,
+                0.0,
+            )
+            - metrics_before.get(
+                metric_name,
+                0.0,
+            ),
+            0.0,
         )
-        for metric_name in metrics_after
+        for metric_name in metrics_before
     }
 
 
@@ -189,7 +259,13 @@ def run_one_request(
     request_spec: RequestSpec,
     experiment_start_time: float,
     vllm_url: str,
-) -> tuple:
+):
+    """
+    Run exactly one request.
+
+    Prefix-cache cases are deliberately sequential so the
+    cache state established by R1 exists before R2 runs.
+    """
 
     request_result, event_records = (
         send_streaming_request(
@@ -200,10 +276,66 @@ def run_one_request(
     )
 
     for event_record in event_records:
-        event_record.experiment_name = EXPERIMENT_NAME
-        event_record.experiment_mode = "prefix-reuse"
 
-    return request_result, event_records
+        event_record.experiment_name = (
+            EXPERIMENT_NAME
+        )
+
+        event_record.experiment_mode = (
+            "prefix-reuse"
+        )
+
+    return (
+        request_result,
+        event_records,
+    )
+
+
+def build_cache_evidence(
+    request_id: str,
+    metric_delta: dict[str, float],
+    time_to_first_token_seconds: float | None,
+    total_request_seconds: float,
+) -> dict:
+
+    queried_tokens = metric_delta[
+        "prefix_queries"
+    ]
+
+    hit_tokens = metric_delta[
+        "prefix_hits"
+    ]
+
+    if queried_tokens > 0:
+
+        hit_rate_percent = (
+            hit_tokens
+            / queried_tokens
+            * 100.0
+        )
+
+    else:
+        hit_rate_percent = 0.0
+
+    return {
+        "request_id":
+            request_id,
+
+        "prefix_query_tokens":
+            queried_tokens,
+
+        "prefix_hit_tokens":
+            hit_tokens,
+
+        "prefix_hit_rate_percent":
+            hit_rate_percent,
+
+        "time_to_first_token_seconds":
+            time_to_first_token_seconds,
+
+        "total_request_seconds":
+            total_request_seconds,
+    }
 
 
 def run_prefix_cache_experiment(
@@ -212,18 +344,36 @@ def run_prefix_cache_experiment(
 
     request_specs = build_requests()
 
-    metrics_url = f"{vllm_url}/metrics"
+    metrics_url = (
+        f"{vllm_url}/metrics"
+    )
 
-    experiment_start_time = time.perf_counter()
+    experiment_start_time = (
+        time.perf_counter()
+    )
 
     all_request_results = []
     all_event_records = []
-    cache_evidence = []
+    cache_evidence_rows = []
 
+    #
+    # IMPORTANT:
+    #
+    # Sequential execution is intentional.
+    #
+    # R1 must complete and leave reusable KV blocks behind
+    # before R2 tests reuse.
+    #
     for request_spec in request_specs:
 
-        metrics_before = fetch_prefix_cache_metrics(
-            metrics_url=metrics_url,
+        print(
+            f"Running {request_spec.request_id}..."
+        )
+
+        metrics_before = (
+            fetch_prefix_cache_metrics(
+                metrics_url=metrics_url,
+            )
         )
 
         request_result, event_records = (
@@ -234,52 +384,38 @@ def run_prefix_cache_experiment(
             )
         )
 
-        metrics_after = fetch_prefix_cache_metrics(
-            metrics_url=metrics_url,
-        )
-
-        metric_delta = calculate_metric_delta(
-            metrics_before=metrics_before,
-            metrics_after=metrics_after,
-        )
-
-        queried_tokens = metric_delta[
-            "prefix_queries"
-        ]
-
-        hit_tokens = metric_delta[
-            "prefix_hits"
-        ]
-
-        if queried_tokens > 0:
-            hit_rate_percent = (
-                hit_tokens
-                / queried_tokens
-                * 100.0
+        metrics_after = (
+            fetch_prefix_cache_metrics(
+                metrics_url=metrics_url,
             )
-        else:
-            hit_rate_percent = 0.0
+        )
 
-        cache_evidence.append(
-            {
-                "request_id":
-                    request_spec.request_id,
+        metric_delta = (
+            calculate_metric_delta(
+                metrics_before=metrics_before,
+                metrics_after=metrics_after,
+            )
+        )
 
-                "prefix_query_tokens":
-                    queried_tokens,
+        cache_evidence = (
+            build_cache_evidence(
+                request_id=(
+                    request_spec.request_id
+                ),
+                metric_delta=metric_delta,
+                time_to_first_token_seconds=(
+                    request_result
+                    .time_to_first_token_seconds
+                ),
+                total_request_seconds=(
+                    request_result
+                    .total_request_seconds
+                ),
+            )
+        )
 
-                "prefix_hit_tokens":
-                    hit_tokens,
-
-                "prefix_hit_rate_percent":
-                    hit_rate_percent,
-
-                "time_to_first_token_seconds":
-                    request_result.time_to_first_token_seconds,
-
-                "total_request_seconds":
-                    request_result.total_request_seconds,
-            }
+        cache_evidence_rows.append(
+            cache_evidence
         )
 
         all_request_results.append(
@@ -293,18 +429,22 @@ def run_prefix_cache_experiment(
     save_results(
         request_results=all_request_results,
         event_records=all_event_records,
-        cache_evidence=cache_evidence,
+        cache_evidence_rows=(
+            cache_evidence_rows
+        ),
     )
 
     print_summary(
-        cache_evidence=cache_evidence,
+        cache_evidence_rows=(
+            cache_evidence_rows
+        ),
     )
 
 
 def save_results(
     request_results,
     event_records,
-    cache_evidence: list[dict],
+    cache_evidence_rows: list[dict],
 ) -> None:
 
     RESULTS_DIRECTORY.mkdir(
@@ -328,10 +468,12 @@ def save_results(
         ),
     )
 
-    with (
+    output_path = (
         RESULTS_DIRECTORY
         / "prefix-cache-evidence.csv"
-    ).open(
+    )
+
+    with output_path.open(
         "w",
         newline="",
         encoding="utf-8",
@@ -339,15 +481,20 @@ def save_results(
 
         writer = csv.DictWriter(
             output_file,
-            fieldnames=cache_evidence[0].keys(),
+            fieldnames=(
+                cache_evidence_rows[0].keys()
+            ),
         )
 
         writer.writeheader()
-        writer.writerows(cache_evidence)
+
+        writer.writerows(
+            cache_evidence_rows
+        )
 
 
 def print_summary(
-    cache_evidence: list[dict],
+    cache_evidence_rows: list[dict],
 ) -> None:
 
     print()
@@ -364,17 +511,18 @@ def print_summary(
 
     print("-" * 64)
 
-    for evidence in cache_evidence:
+    for evidence in cache_evidence_rows:
 
-        time_to_first_token = (
-            evidence[
-                "time_to_first_token_seconds"
-            ]
-        )
+        time_to_first_token = evidence[
+            "time_to_first_token_seconds"
+        ]
 
         if time_to_first_token is None:
+
             formatted_ttft = "N/A"
+
         else:
+
             formatted_ttft = (
                 f"{time_to_first_token:.4f}"
             )
@@ -389,6 +537,23 @@ def print_summary(
 
     print()
 
+    print("Expected pattern")
+    print("----------------")
+
+    print(
+        "R1-COLD    -> little/no cached prefix"
+    )
+
+    print(
+        "R2-REUSE   -> high prefix reuse"
+    )
+
+    print(
+        "R3-MUTATED -> reuse should fall sharply"
+    )
+
+    print()
+
 
 def print_prediction() -> None:
 
@@ -397,19 +562,20 @@ def print_prediction() -> None:
     print("----------")
 
     print(
-        "R1-COLD has no previously cached prefix, so it should "
-        "have little or no prefix-cache reuse."
+        "R1-COLD has no matching prefix cached yet, "
+        "so it should perform the original prefill work."
     )
 
     print(
-        "R2-REUSE uses the identical long prefix, so most full "
-        "prefix blocks should be cache hits."
+        "R2-REUSE uses the exact same long prefix. "
+        "Most full prefix blocks should therefore be reusable."
     )
 
     print(
-        "R3-MUTATED changes one word near the beginning. "
-        "Because later block hashes depend on their preceding prefix, "
-        "reuse should fall sharply after that change."
+        "R3-MUTATED changes one word near the beginning "
+        "of the prefix. Because downstream block hashes depend "
+        "on their preceding prefix, reuse should fall sharply "
+        "after that mutation."
     )
 
     print()
@@ -417,17 +583,24 @@ def print_prediction() -> None:
 
 def print_server_requirement() -> None:
 
-    print("Required server configuration")
-    print("-----------------------------")
+    print(
+        "Required server configuration"
+    )
 
     print(
-        "Qwen3 server with automatic prefix caching enabled:"
+        "-----------------------------"
+    )
+
+    print(
+        "Start Qwen3 with automatic prefix caching enabled:"
     )
 
     print()
+
     print(
         "  --enable-prefix-caching"
     )
+
     print()
 
 
@@ -460,9 +633,12 @@ def main() -> None:
     request_specs = build_requests()
 
     print()
-    print(f"Experiment : {EXPERIMENT_NAME}")
+    print(
+        f"Experiment : {EXPERIMENT_NAME}"
+    )
 
     print_prediction()
+
     print_server_requirement()
 
     if arguments.dry_run:
@@ -472,6 +648,17 @@ def main() -> None:
             experiment_name=EXPERIMENT_NAME,
             experiment_mode="prefix-reuse",
         )
+
+        print()
+        print(
+            "Execution order on MI300X:"
+        )
+
+        print(
+            "R1-COLD -> R2-REUSE -> R3-MUTATED"
+        )
+
+        print()
 
         return
 

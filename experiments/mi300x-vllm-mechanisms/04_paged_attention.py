@@ -25,14 +25,23 @@ RESULTS_DIRECTORY = Path(
 
 OUTPUT_TOKENS = 64
 
+DEFAULT_BLOCK_SIZE = 16
+
 
 def build_request() -> RequestSpec:
     """
-    One request is enough.
+    Build one request that generates enough tokens to cross
+    several KV-cache block boundaries.
 
-    The prompt establishes an existing KV cache.
-    The 64 generated tokens then force the logical sequence
-    to cross additional KV-cache block boundaries.
+    We need only one request because this experiment is about:
+
+        logical sequence position
+            ->
+        logical KV block
+            ->
+        physical KV block
+            ->
+        PagedAttention
     """
 
     return RequestSpec(
@@ -50,17 +59,17 @@ def build_request() -> RequestSpec:
     )
 
 
-def tokenize_chat_prompt(
+def get_exact_prompt_token_count(
     prompt: str,
     vllm_url: str,
     model_name: str = DEFAULT_MODEL_NAME,
 ) -> int:
     """
-    Ask the running vLLM server for the exact Qwen chat-template
+    Ask the running Qwen3 server for the exact chat-template
     token count.
 
-    We do not guess prompt length locally because chat-template
-    tokens also belong to the sequence stored in the KV cache.
+    We use the actual model tokenizer instead of estimating
+    token count from words or characters.
     """
 
     tokenize_payload = {
@@ -94,11 +103,14 @@ def tokenize_chat_prompt(
         tokenize_request,
         timeout=30,
     ) as response:
+
         tokenize_response = json.loads(
             response.read().decode("utf-8")
         )
 
-    return int(tokenize_response["count"])
+    return int(
+        tokenize_response["count"]
+    )
 
 
 def calculate_logical_block_number(
@@ -106,13 +118,14 @@ def calculate_logical_block_number(
     block_size: int,
 ) -> int:
     """
-    Convert a zero-based token position into its logical KV block.
+    Convert a zero-based sequence token position into
+    its logical KV-cache block.
 
     Example with block_size=16:
 
-        token 0..15   -> logical block 0
-        token 16..31  -> logical block 1
-        token 32..47  -> logical block 2
+        tokens 0-15   -> block 0
+        tokens 16-31  -> block 1
+        tokens 32-47  -> block 2
     """
 
     return token_position // block_size
@@ -124,30 +137,40 @@ def build_block_boundary_records(
     block_size: int,
 ) -> list[dict]:
     """
-    Describe only the points where generation enters a new logical block.
+    Record each point during generation where the sequence
+    enters a new logical KV block.
 
-    This is the logical view.
+    Physical block IDs are NOT calculated here.
 
-    The physical block IDs will come from vLLM's KV-cache manager
-    during the GPU experiment.
+    They come from TraceScheduler using:
+
+        kv_cache_manager.get_block_ids(request_id)
+
+    during the real MI300X run.
     """
 
-    records: list[dict] = []
+    block_boundary_records: list[dict] = []
 
-    total_sequence_tokens = (
+    first_generated_token_position = (
+        prompt_token_count
+    )
+
+    final_sequence_token_position = (
         prompt_token_count
         + output_token_count
+        - 1
     )
 
     previous_logical_block = None
 
-    for token_position in range(
-        prompt_token_count,
-        total_sequence_tokens,
+    for sequence_token_position in range(
+        first_generated_token_position,
+        final_sequence_token_position + 1,
     ):
+
         logical_block = (
             calculate_logical_block_number(
-                token_position=token_position,
+                token_position=sequence_token_position,
                 block_size=block_size,
             )
         )
@@ -156,15 +179,15 @@ def build_block_boundary_records(
             continue
 
         generated_token_number = (
-            token_position
+            sequence_token_position
             - prompt_token_count
             + 1
         )
 
-        records.append(
+        block_boundary_records.append(
             {
                 "sequence_token_position":
-                    token_position,
+                    sequence_token_position,
 
                 "generated_token_number":
                     generated_token_number,
@@ -179,7 +202,7 @@ def build_block_boundary_records(
 
         previous_logical_block = logical_block
 
-    return records
+    return block_boundary_records
 
 
 def write_dictionary_csv(
@@ -220,22 +243,30 @@ def print_logical_block_plan(
         + OUTPUT_TOKENS
     )
 
-    starting_logical_block = (
+    prompt_last_token_position = (
+        prompt_token_count - 1
+    )
+
+    final_sequence_token_position = (
+        total_sequence_tokens - 1
+    )
+
+    prompt_ending_block = (
         calculate_logical_block_number(
-            token_position=prompt_token_count - 1,
+            token_position=prompt_last_token_position,
             block_size=block_size,
         )
     )
 
-    ending_logical_block = (
+    final_sequence_block = (
         calculate_logical_block_number(
-            token_position=total_sequence_tokens - 1,
+            token_position=final_sequence_token_position,
             block_size=block_size,
         )
     )
 
-    total_logical_blocks = (
-        ending_logical_block + 1
+    logical_blocks_used = (
+        final_sequence_block + 1
     )
 
     print()
@@ -243,27 +274,27 @@ def print_logical_block_plan(
     print("-----------------")
 
     print(
-        f"Prompt tokens       : {prompt_token_count}"
+        f"Prompt tokens          : {prompt_token_count}"
     )
 
     print(
-        f"Generated tokens    : {OUTPUT_TOKENS}"
+        f"Generated tokens       : {OUTPUT_TOKENS}"
     )
 
     print(
-        f"KV block size       : {block_size}"
+        f"KV block size          : {block_size}"
     )
 
     print(
-        f"Prompt ends in block: {starting_logical_block}"
+        f"Prompt ends in block   : {prompt_ending_block}"
     )
 
     print(
-        f"Sequence ends block : {ending_logical_block}"
+        f"Sequence ends in block : {final_sequence_block}"
     )
 
     print(
-        f"Logical blocks used : {total_logical_blocks}"
+        f"Logical blocks used    : {logical_blocks_used}"
     )
 
     print()
@@ -279,14 +310,19 @@ def print_prediction(
 
     print(
         f"With a KV block size of {block_size}, every "
-        f"{block_size} logical sequence tokens require another "
-        "KV-cache page."
+        f"{block_size} logical sequence positions require "
+        "another KV-cache block."
     )
 
     print(
-        "Those logical pages do NOT need to be physically adjacent. "
-        "PagedAttention should use the request's block table to find "
-        "the physical KV pages during decode."
+        "Logical blocks should look contiguous from the request's "
+        "point of view, but the actual physical GPU block IDs "
+        "do not need to be contiguous."
+    )
+
+    print(
+        "PagedAttention should use the request's block table "
+        "to locate those physical KV blocks during decode."
     )
 
     print()
@@ -300,10 +336,11 @@ def print_server_requirement(
     print("-----------------------------")
 
     print(
-        "Qwen3 server with TraceScheduler and:"
+        "Start Qwen3 with TraceScheduler and:"
     )
 
     print()
+
     print(
         f"  --block-size {block_size}"
     )
@@ -311,8 +348,69 @@ def print_server_requirement(
     print()
 
     print(
-        "For the GPU execution phase, the scheduler tracer will also "
-        "record the physical KV block IDs assigned to R1-PAGED-KV."
+        "Enable full physical KV block tracing:"
+    )
+
+    print()
+
+    print(
+        "  TRACE_KV_BLOCK_IDS=1"
+    )
+
+    print()
+
+    print(
+        "The scheduler trace should therefore show:"
+    )
+
+    print(
+        "  request_id"
+    )
+
+    print(
+        "  num_computed_tokens_before_step"
+    )
+
+    print(
+        "  physical_block_count"
+    )
+
+    print(
+        "  physical_block_ids_by_group"
+    )
+
+    print(
+        "  new_block_ids_this_step"
+    )
+
+    print()
+
+
+def print_evidence_goal() -> None:
+
+    print("Evidence goal")
+    print("-------------")
+
+    print(
+        "For R1-PAGED-KV we want to correlate:"
+    )
+
+    print()
+
+    print(
+        "  sequence token position"
+    )
+
+    print(
+        "        -> logical KV block"
+    )
+
+    print(
+        "        -> physical GPU KV block ID"
+    )
+
+    print(
+        "        -> paged_attention kernel"
     )
 
     print()
@@ -322,8 +420,9 @@ def parse_arguments() -> argparse.Namespace:
 
     argument_parser = argparse.ArgumentParser(
         description=(
-            "EXP-04: Connect logical token positions to paged "
-            "KV-cache blocks and the real PagedAttention path."
+            "EXP-04: Connect logical sequence positions to "
+            "physical KV-cache blocks and the real "
+            "PagedAttention decode path."
         )
     )
 
@@ -334,9 +433,11 @@ def parse_arguments() -> argparse.Namespace:
             16,
             32,
         ],
-        required=True,
+        default=DEFAULT_BLOCK_SIZE,
         help=(
-            "ROCm PagedAttention KV-cache block size."
+            "KV-cache block size. "
+            "Use 16 for the primary experiment. "
+            "32 is optional follow-up."
         ),
     )
 
@@ -359,9 +460,18 @@ def main() -> None:
 
     request_spec = build_request()
 
+    experiment_mode = (
+        f"block-{arguments.block_size}"
+    )
+
     print()
-    print(f"Experiment : {EXPERIMENT_NAME}")
-    print(f"Block size : {arguments.block_size}")
+    print(
+        f"Experiment : {EXPERIMENT_NAME}"
+    )
+
+    print(
+        f"Mode       : {experiment_mode}"
+    )
 
     print_prediction(
         block_size=arguments.block_size,
@@ -371,26 +481,28 @@ def main() -> None:
         block_size=arguments.block_size,
     )
 
+    print_evidence_goal()
+
     if arguments.dry_run:
 
         print_dry_run(
             request_specs=[request_spec],
             experiment_name=EXPERIMENT_NAME,
-            experiment_mode=(
-                f"block-{arguments.block_size}"
-            ),
+            experiment_mode=experiment_mode,
         )
 
         print(
-            "Exact logical block boundaries will be calculated "
-            "on MI300X using vLLM's /tokenize endpoint."
+            "Exact Qwen token count and logical block boundaries "
+            "will be calculated against the running server."
         )
 
         return
 
-    prompt_token_count = tokenize_chat_prompt(
-        prompt=request_spec.prompt,
-        vllm_url=arguments.vllm_url,
+    prompt_token_count = (
+        get_exact_prompt_token_count(
+            prompt=request_spec.prompt,
+            vllm_url=arguments.vllm_url,
+        )
     )
 
     block_boundary_records = (
@@ -404,10 +516,6 @@ def main() -> None:
     print_logical_block_plan(
         prompt_token_count=prompt_token_count,
         block_size=arguments.block_size,
-    )
-
-    experiment_mode = (
-        f"block-{arguments.block_size}"
     )
 
     request_results, event_records = (
@@ -448,8 +556,9 @@ def main() -> None:
         ),
     )
 
+    print()
     print(
-        "Evidence saved under:"
+        "Client-side evidence saved under:"
     )
 
     print(
@@ -459,12 +568,15 @@ def main() -> None:
     print()
 
     print(
-        "Next evidence to correlate:"
+        "The server-side [BATCH_TRACE] log contains the "
+        "physical KV block IDs."
     )
 
+    print()
+
     print(
-        "logical block -> physical KV block ID -> "
-        "paged_attention kernel"
+        "During the GPU execution phase, correlate those block "
+        "transitions with one targeted PagedAttention kernel trace."
     )
 
     print()

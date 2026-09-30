@@ -25,11 +25,25 @@ RESULTS_DIRECTORY = Path(
 
 METRIC_SAMPLE_INTERVAL_SECONDS = 0.05
 
-METRICS_TO_OBSERVE = {
-    "vllm:kv_cache_usage_perc",
-    "vllm:num_requests_running",
-    "vllm:num_requests_waiting",
-    "vllm:num_preemptions",
+
+# Prometheus may expose Counter metrics with a "_total" suffix.
+# We map the actual exposed metric names to the logical names
+# used inside this experiment.
+METRIC_NAME_MAP = {
+    "vllm:kv_cache_usage_perc":
+        "kv_cache_usage",
+
+    "vllm:num_requests_running":
+        "running_requests",
+
+    "vllm:num_requests_waiting":
+        "waiting_requests",
+
+    "vllm:num_preemptions":
+        "preemptions",
+
+    "vllm:num_preemptions_total":
+        "preemptions",
 }
 
 
@@ -37,8 +51,8 @@ def build_requests() -> list[RequestSpec]:
     """
     Four requests generate long outputs concurrently.
 
-    As output tokens accumulate, each request needs more KV-cache
-    storage for its growing sequence.
+    As each sequence grows, more K/V state must remain resident
+    in the GPU KV cache.
     """
 
     return [
@@ -93,18 +107,32 @@ def fetch_vllm_metrics(
     metrics_url: str,
 ) -> dict[str, float]:
     """
-    Read the vLLM Prometheus metrics endpoint and return only
-    the few metrics needed for this experiment.
+    Read the vLLM Prometheus endpoint.
+
+    Return only the metrics needed for this experiment:
+
+        KV-cache utilization
+        running requests
+        waiting requests
+        cumulative preemptions
     """
 
-    observed_metrics: dict[str, float] = {}
+    observed_metrics = {
+        "kv_cache_usage": 0.0,
+        "running_requests": 0.0,
+        "waiting_requests": 0.0,
+        "preemptions": 0.0,
+    }
 
     with urllib.request.urlopen(
         metrics_url,
         timeout=5,
     ) as response:
+        metrics_text = response.read().decode(
+            "utf-8"
+        )
 
-        metrics_text = response.read().decode("utf-8")
+    seen_preemption_metric = False
 
     for line in metrics_text.splitlines():
 
@@ -113,31 +141,72 @@ def fetch_vllm_metrics(
         if not line or line.startswith("#"):
             continue
 
-        metric_and_value = line.split()
+        metric_fields = line.split()
 
-        if len(metric_and_value) < 2:
+        if len(metric_fields) < 2:
             continue
 
-        metric_with_labels = metric_and_value[0]
-        metric_value_text = metric_and_value[1]
+        metric_with_labels = metric_fields[0]
 
-        metric_name = metric_with_labels.split("{", 1)[0]
+        metric_name = metric_with_labels.split(
+            "{",
+            1,
+        )[0]
 
-        if metric_name not in METRICS_TO_OBSERVE:
+        if metric_name not in METRIC_NAME_MAP:
             continue
+
+        logical_metric_name = (
+            METRIC_NAME_MAP[metric_name]
+        )
 
         try:
-            metric_value = float(metric_value_text)
+            metric_value = float(
+                metric_fields[1]
+            )
         except ValueError:
             continue
 
-        # Some Prometheus metrics may appear more than once
-        # with different labels. Summing is appropriate for
-        # request/preemption counts. KV usage normally has one value.
-        if metric_name in observed_metrics:
-            observed_metrics[metric_name] += metric_value
+        #
+        # Avoid double-counting if both the base counter name
+        # and Prometheus "_total" form happen to be exposed.
+        #
+        if logical_metric_name == "preemptions":
+
+            if (
+                metric_name
+                == "vllm:num_preemptions_total"
+            ):
+                observed_metrics[
+                    "preemptions"
+                ] = metric_value
+
+                seen_preemption_metric = True
+
+            elif not seen_preemption_metric:
+                observed_metrics[
+                    "preemptions"
+                ] = metric_value
+
+            continue
+
+        #
+        # Other metrics may be emitted with labels.
+        # Sum request counts if more than one engine/label
+        # contributes.
+        #
+        if logical_metric_name in {
+            "running_requests",
+            "waiting_requests",
+        }:
+            observed_metrics[
+                logical_metric_name
+            ] += metric_value
+
         else:
-            observed_metrics[metric_name] = metric_value
+            observed_metrics[
+                logical_metric_name
+            ] = metric_value
 
     return observed_metrics
 
@@ -149,16 +218,17 @@ def sample_metrics_until_stopped(
     metric_samples: list[dict],
 ) -> None:
     """
-    Poll vLLM while requests are running.
+    Poll vLLM while inference requests are active.
 
-    This lets us see KV-cache occupancy grow over time rather
-    than only observing its final value.
+    This gives us a timeline rather than only a final KV-cache
+    utilization number.
     """
 
     while not stop_sampling.is_set():
 
         elapsed_seconds = (
-            time.perf_counter() - experiment_start_time
+            time.perf_counter()
+            - experiment_start_time
         )
 
         try:
@@ -168,38 +238,55 @@ def sample_metrics_until_stopped(
 
             metric_samples.append(
                 {
-                    "elapsed_seconds": elapsed_seconds,
-                    "kv_cache_usage_percent": (
-                        metrics.get(
-                            "vllm:kv_cache_usage_perc",
-                            0.0,
-                        )
-                        * 100.0
-                    ),
-                    "running_requests": metrics.get(
-                        "vllm:num_requests_running",
-                        0.0,
-                    ),
-                    "waiting_requests": metrics.get(
-                        "vllm:num_requests_waiting",
-                        0.0,
-                    ),
-                    "preemptions": metrics.get(
-                        "vllm:num_preemptions",
-                        0.0,
-                    ),
+                    "elapsed_seconds":
+                        elapsed_seconds,
+
+                    "kv_cache_usage_percent":
+                        (
+                            metrics[
+                                "kv_cache_usage"
+                            ]
+                            * 100.0
+                        ),
+
+                    "running_requests":
+                        metrics[
+                            "running_requests"
+                        ],
+
+                    "waiting_requests":
+                        metrics[
+                            "waiting_requests"
+                        ],
+
+                    "preemptions":
+                        metrics[
+                            "preemptions"
+                        ],
                 }
             )
 
         except Exception as error:
+
             metric_samples.append(
                 {
-                    "elapsed_seconds": elapsed_seconds,
-                    "kv_cache_usage_percent": "",
-                    "running_requests": "",
-                    "waiting_requests": "",
-                    "preemptions": "",
-                    "error": str(error),
+                    "elapsed_seconds":
+                        elapsed_seconds,
+
+                    "kv_cache_usage_percent":
+                        "",
+
+                    "running_requests":
+                        "",
+
+                    "waiting_requests":
+                        "",
+
+                    "preemptions":
+                        "",
+
+                    "error":
+                        str(error),
                 }
             )
 
@@ -213,19 +300,19 @@ def write_metric_samples(
     output_path: Path,
 ) -> None:
 
+    if not metric_samples:
+        return
+
     output_path.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    if not metric_samples:
-        return
-
     field_names = sorted(
         {
             field_name
             for sample in metric_samples
-            for field_name in sample.keys()
+            for field_name in sample
         }
     )
 
@@ -241,7 +328,10 @@ def write_metric_samples(
         )
 
         writer.writeheader()
-        writer.writerows(metric_samples)
+
+        writer.writerows(
+            metric_samples
+        )
 
 
 def run_kv_cache_experiment(
@@ -255,7 +345,9 @@ def run_kv_cache_experiment(
         f"{vllm_url}/metrics"
     )
 
-    experiment_start_time = time.perf_counter()
+    experiment_start_time = (
+        time.perf_counter()
+    )
 
     stop_sampling = threading.Event()
 
@@ -264,10 +356,17 @@ def run_kv_cache_experiment(
     metrics_thread = threading.Thread(
         target=sample_metrics_until_stopped,
         kwargs={
-            "metrics_url": metrics_url,
-            "experiment_start_time": experiment_start_time,
-            "stop_sampling": stop_sampling,
-            "metric_samples": metric_samples,
+            "metrics_url":
+                metrics_url,
+
+            "experiment_start_time":
+                experiment_start_time,
+
+            "stop_sampling":
+                stop_sampling,
+
+            "metric_samples":
+                metric_samples,
         },
         daemon=True,
     )
@@ -289,7 +388,8 @@ def run_kv_cache_experiment(
         metrics_thread.join()
 
     mode_results_directory = (
-        RESULTS_DIRECTORY / experiment_mode
+        RESULTS_DIRECTORY
+        / experiment_mode
     )
 
     write_csv(
@@ -331,7 +431,9 @@ def print_summary(
         sample
         for sample in metric_samples
         if isinstance(
-            sample.get("kv_cache_usage_percent"),
+            sample.get(
+                "kv_cache_usage_percent"
+            ),
             float,
         )
     ]
@@ -339,53 +441,101 @@ def print_summary(
     print()
     print("KV-cache experiment summary")
     print("---------------------------")
-    print(f"Mode: {experiment_mode}")
+
+    print(
+        f"Mode: {experiment_mode}"
+    )
 
     if not valid_samples:
-        print("No valid KV-cache metric samples collected.")
+        print(
+            "No valid KV-cache metric "
+            "samples collected."
+        )
         return
 
     maximum_kv_usage = max(
-        sample["kv_cache_usage_percent"]
+        sample[
+            "kv_cache_usage_percent"
+        ]
         for sample in valid_samples
     )
 
     maximum_running_requests = max(
-        sample["running_requests"]
+        sample[
+            "running_requests"
+        ]
         for sample in valid_samples
     )
 
     maximum_waiting_requests = max(
-        sample["waiting_requests"]
+        sample[
+            "waiting_requests"
+        ]
         for sample in valid_samples
     )
 
     maximum_preemptions = max(
-        sample["preemptions"]
+        sample[
+            "preemptions"
+        ]
         for sample in valid_samples
     )
 
     print(
-        f"Maximum KV-cache usage : "
+        "Maximum KV-cache usage : "
         f"{maximum_kv_usage:.1f}%"
     )
 
     print(
-        f"Maximum running requests: "
+        "Maximum running requests: "
         f"{maximum_running_requests:.0f}"
     )
 
     print(
-        f"Maximum waiting requests: "
+        "Maximum waiting requests: "
         f"{maximum_waiting_requests:.0f}"
     )
 
     print(
-        f"Observed preemptions     : "
+        "Observed preemptions     : "
         f"{maximum_preemptions:.0f}"
     )
 
     print()
+
+    if experiment_mode == "pressure":
+
+        print(
+            "Interpretation:"
+        )
+
+        if maximum_preemptions > 0:
+            print(
+                "KV pressure caused at least one "
+                "request preemption/recompute."
+            )
+
+        elif maximum_waiting_requests > 0:
+            print(
+                "KV capacity became restrictive, "
+                "but admission/waiting prevented "
+                "preemption."
+            )
+
+        elif maximum_kv_usage >= 95.0:
+            print(
+                "KV cache reached high occupancy, "
+                "but this workload did not force "
+                "waiting or preemption."
+            )
+
+        else:
+            print(
+                "The configured pressure was not "
+                "strong enough to exhaust KV capacity."
+            )
+
+        print()
 
 
 def print_prediction(
@@ -400,17 +550,19 @@ def print_prediction(
 
         print(
             "With the normal MI300X KV-cache allocation, "
-            "cache usage should rise as the four sequences grow, "
-            "but the requests should remain comfortably within capacity."
+            "cache usage should increase as the four "
+            "sequences grow, while all requests remain "
+            "comfortably within available capacity."
         )
 
     elif experiment_mode == "pressure":
 
         print(
-            "With the number of GPU KV blocks deliberately restricted, "
-            "cache usage should approach 100%. vLLM may queue or preempt "
-            "requests because all active sequences cannot retain their "
-            "required KV blocks simultaneously."
+            "With the GPU KV block pool deliberately "
+            "restricted, cache utilization should approach "
+            "capacity. vLLM may make requests wait or "
+            "preempt/recompute work when there are not "
+            "enough KV blocks for every active sequence."
         )
 
     print()
@@ -420,24 +572,37 @@ def print_server_requirement(
     experiment_mode: str,
 ) -> None:
 
-    print("Required server configuration")
-    print("-----------------------------")
+    print(
+        "Required server configuration"
+    )
+
+    print(
+        "-----------------------------"
+    )
 
     if experiment_mode == "baseline":
 
         print(
-            "Normal Qwen3 server. Let vLLM size the KV cache normally."
+            "Normal Qwen3 server. "
+            "Let vLLM size the KV cache normally."
         )
 
     elif experiment_mode == "pressure":
 
         print(
-            "Use the same Qwen3 server, but deliberately constrain "
-            "the number of KV blocks:"
+            "Same Qwen3 server, but deliberately "
+            "restrict the KV block pool:"
         )
+
         print()
-        print("  --block-size 16")
-        print("  --num-gpu-blocks-override 128")
+
+        print(
+            "  --block-size 16"
+        )
+
+        print(
+            "  --num-gpu-blocks-override 128"
+        )
 
     print()
 
@@ -446,8 +611,8 @@ def parse_arguments() -> argparse.Namespace:
 
     argument_parser = argparse.ArgumentParser(
         description=(
-            "EXP-03: Observe KV-cache growth and deliberately "
-            "create KV-cache pressure."
+            "EXP-03: Observe KV-cache growth "
+            "and deliberately create KV-cache pressure."
         )
     )
 
@@ -480,8 +645,13 @@ def main() -> None:
     request_specs = build_requests()
 
     print()
-    print(f"Experiment : {EXPERIMENT_NAME}")
-    print(f"Mode       : {arguments.mode}")
+    print(
+        f"Experiment : {EXPERIMENT_NAME}"
+    )
+
+    print(
+        f"Mode       : {arguments.mode}"
+    )
 
     print_prediction(
         experiment_mode=arguments.mode,

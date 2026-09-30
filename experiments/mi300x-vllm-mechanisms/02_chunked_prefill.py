@@ -84,14 +84,22 @@ def get_requests_for_mode(
     experiment_mode: str,
 ) -> list[RequestSpec]:
     """
-    Client workload stays identical.
+    The client workload stays identical in both modes.
 
-    Only the server scheduler configuration changes between modes.
+    Only one server-side variable changes:
+
+        max_num_batched_tokens
+
+    Baseline:
+        4096-token scheduler budget
+
+    Small-budget:
+        512-token scheduler budget
     """
 
     if experiment_mode in {
         "baseline",
-        "chunked",
+        "small-budget",
     }:
         return build_requests()
 
@@ -110,17 +118,17 @@ def print_experiment_prediction(
 
     if experiment_mode == "baseline":
         print(
-            "R2's long prompt should be scheduled with the normal "
-            "server token budget. We record how many scheduler "
-            "iterations its prefill requires."
+            "Chunked prefill is enabled, but the scheduler has a "
+            "large 4096-token budget. R2's long prompt should fit "
+            "mostly or entirely into one scheduler iteration."
         )
 
-    elif experiment_mode == "chunked":
+    elif experiment_mode == "small-budget":
         print(
-            "With chunked prefill enabled and a deliberately small "
-            "per-iteration token budget, R2's prompt should appear "
-            "across multiple scheduler iterations while R1 continues "
-            "to receive decode work."
+            "Chunked prefill is still enabled, but the scheduler "
+            "budget is reduced to 512 tokens. R2's long prompt "
+            "should therefore be split across multiple scheduler "
+            "iterations while R1 continues decoding."
         )
 
     print()
@@ -133,17 +141,19 @@ def print_server_requirement(
     print("Required server configuration")
     print("-----------------------------")
 
-    if experiment_mode == "baseline":
-        print(
-            "Normal Qwen3 server with TraceScheduler. "
-            "Do not deliberately reduce max-num-batched-tokens."
-        )
+    print(
+        "Chunked prefill must be enabled in BOTH modes."
+    )
 
-    elif experiment_mode == "chunked":
-        print(
-            "Same Qwen3 server with TraceScheduler, plus:"
-        )
-        print()
+    print()
+
+    if experiment_mode == "baseline":
+
+        print("  --enable-chunked-prefill")
+        print("  --max-num-batched-tokens 4096")
+
+    elif experiment_mode == "small-budget":
+
         print("  --enable-chunked-prefill")
         print("  --max-num-batched-tokens 512")
 
@@ -242,12 +252,12 @@ def parse_arguments() -> argparse.Namespace:
         "--mode",
         choices=[
             "baseline",
-            "chunked",
+            "small-budget",
         ],
         required=True,
         help=(
-            "baseline = normal scheduler token budget; "
-            "chunked = small token budget forces long prefill chunks"
+            "baseline = chunked prefill with 4096-token budget; "
+            "small-budget = chunked prefill with 512-token budget"
         ),
     )
 
@@ -323,12 +333,14 @@ def main() -> None:
     )
 
     print()
+
     print(
         "Primary mechanism evidence comes from [BATCH_TRACE]. "
-        "Look for R2-LONG-PREFILL receiving hundreds of tokens "
-        "across multiple scheduler steps while R1-DECODE continues "
-        "receiving decode work."
+        "Compare how many scheduler iterations R2-LONG-PREFILL "
+        "requires with a 4096-token budget versus a 512-token budget, "
+        "while R1-DECODE continues receiving decode work."
     )
+
     print()
 
 

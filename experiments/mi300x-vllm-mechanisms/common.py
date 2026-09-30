@@ -119,6 +119,7 @@ def send_streaming_request(
         data=encoded_payload,
         headers={
             "Content-Type": "application/json",
+            "x-request-id": request_spec.request_id,
         },
         method="POST",
     )

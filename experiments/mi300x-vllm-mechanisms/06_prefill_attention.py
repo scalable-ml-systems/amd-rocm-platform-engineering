@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import time
 import urllib.request
 
 from pathlib import Path
@@ -12,7 +13,7 @@ from common import (
     RequestSpec,
     make_approximate_token_prompt,
     print_dry_run,
-    run_staggered_requests,
+    send_streaming_request,
     write_csv,
     write_jsonl,
 )
@@ -35,11 +36,11 @@ def build_prompt(
     approximate_token_count: int,
 ) -> str:
     """
-    Construct a deterministic prompt large enough to exercise
-    prefill attention.
+    Build a deterministic prompt intended to produce
+    approximately the requested number of tokens.
 
-    Exact token count will later be measured with the running
-    Qwen tokenizer.
+    Exact Qwen token count is measured against the running
+    server before inference.
     """
 
     technical_context = make_approximate_token_prompt(
@@ -59,10 +60,12 @@ def build_prompt(
 
 def build_requests() -> list[RequestSpec]:
     """
-    Each request generates only one output token.
+    Generate only one output token.
 
-    That keeps the experiment dominated by prompt prefill instead
-    of autoregressive decode.
+    This keeps each request dominated by prompt prefill rather
+    than autoregressive decode.
+
+    These requests will be executed SEQUENTIALLY.
     """
 
     request_specs = []
@@ -93,9 +96,9 @@ def get_exact_prompt_token_count(
     model_name: str = DEFAULT_MODEL_NAME,
 ) -> int:
     """
-    Ask vLLM to tokenize the actual chat request.
+    Use Qwen's actual tokenizer/chat template.
 
-    This avoids pretending that words or characters equal model tokens.
+    We do not assume words or characters equal model tokens.
     """
 
     tokenize_payload = {
@@ -139,56 +142,172 @@ def get_exact_prompt_token_count(
     )
 
 
-def write_prefill_summary(
-    request_specs: list[RequestSpec],
-    request_results,
+def run_one_prefill_request(
+    request_spec: RequestSpec,
+    experiment_mode: str,
+    experiment_start_time: float,
     vllm_url: str,
-    output_path: Path,
-) -> None:
+) -> tuple:
     """
-    Record exact prompt length alongside client-observed latency.
+    Execute exactly one prefill workload.
 
-    TTFT is useful here because the request generates only one token,
-    so most of the request's work occurs during prefill.
+    The next prompt size does not start until this request
+    has completely finished.
     """
 
-    result_by_request_id = {
-        result.request_id: result
-        for result in request_results
+    exact_prompt_token_count = (
+        get_exact_prompt_token_count(
+            prompt=request_spec.prompt,
+            vllm_url=vllm_url,
+        )
+    )
+
+    print()
+    print(
+        f"Running {request_spec.request_id}"
+    )
+
+    print(
+        f"Exact prompt tokens: "
+        f"{exact_prompt_token_count}"
+    )
+
+    request_result, event_records = (
+        send_streaming_request(
+            request_spec=request_spec,
+            experiment_start_time=experiment_start_time,
+            vllm_url=vllm_url,
+        )
+    )
+
+    for event_record in event_records:
+
+        event_record.experiment_name = (
+            EXPERIMENT_NAME
+        )
+
+        event_record.experiment_mode = (
+            experiment_mode
+        )
+
+    summary_row = {
+        "request_id":
+            request_spec.request_id,
+
+        "exact_prompt_tokens":
+            exact_prompt_token_count,
+
+        "time_to_first_token_seconds":
+            request_result.time_to_first_token_seconds,
+
+        "total_request_seconds":
+            request_result.total_request_seconds,
     }
 
-    summary_rows = []
+    return (
+        request_result,
+        event_records,
+        summary_row,
+    )
+
+
+def run_prefill_experiment(
+    request_specs: list[RequestSpec],
+    experiment_mode: str,
+    vllm_url: str,
+) -> None:
+    """
+    Run:
+
+        PREFILL-256
+            finish
+        PREFILL-1024
+            finish
+        PREFILL-4096
+            finish
+
+    No continuous batching is allowed to mix the prompt sizes.
+    """
+
+    experiment_start_time = (
+        time.perf_counter()
+    )
+
+    request_results = []
+    event_records = []
+    prefill_summary_rows = []
 
     for request_spec in request_specs:
 
-        exact_prompt_tokens = (
-            get_exact_prompt_token_count(
-                prompt=request_spec.prompt,
-                vllm_url=vllm_url,
-            )
+        (
+            request_result,
+            request_event_records,
+            summary_row,
+        ) = run_one_prefill_request(
+            request_spec=request_spec,
+            experiment_mode=experiment_mode,
+            experiment_start_time=experiment_start_time,
+            vllm_url=vllm_url,
         )
 
-        request_result = (
-            result_by_request_id[
-                request_spec.request_id
-            ]
+        request_results.append(
+            request_result
         )
 
-        summary_rows.append(
-            {
-                "request_id":
-                    request_spec.request_id,
-
-                "exact_prompt_tokens":
-                    exact_prompt_tokens,
-
-                "time_to_first_token_seconds":
-                    request_result.time_to_first_token_seconds,
-
-                "total_request_seconds":
-                    request_result.total_request_seconds,
-            }
+        event_records.extend(
+            request_event_records
         )
+
+        prefill_summary_rows.append(
+            summary_row
+        )
+
+    save_results(
+        experiment_mode=experiment_mode,
+        request_results=request_results,
+        event_records=event_records,
+        prefill_summary_rows=prefill_summary_rows,
+    )
+
+    print_summary(
+        prefill_summary_rows=(
+            prefill_summary_rows
+        )
+    )
+
+
+def save_results(
+    experiment_mode: str,
+    request_results,
+    event_records,
+    prefill_summary_rows: list[dict],
+) -> None:
+
+    mode_results_directory = (
+        RESULTS_DIRECTORY
+        / experiment_mode
+    )
+
+    write_csv(
+        records=request_results,
+        output_path=(
+            mode_results_directory
+            / "request-results.csv"
+        ),
+    )
+
+    write_jsonl(
+        records=event_records,
+        output_path=(
+            mode_results_directory
+            / "client-events.jsonl"
+        ),
+    )
+
+    output_path = (
+        mode_results_directory
+        / "prefill-summary.csv"
+    )
 
     output_path.parent.mkdir(
         parents=True,
@@ -203,11 +322,55 @@ def write_prefill_summary(
 
         writer = csv.DictWriter(
             output_file,
-            fieldnames=summary_rows[0].keys(),
+            fieldnames=(
+                prefill_summary_rows[0].keys()
+            ),
         )
 
         writer.writeheader()
-        writer.writerows(summary_rows)
+        writer.writerows(
+            prefill_summary_rows
+        )
+
+
+def print_summary(
+    prefill_summary_rows: list[dict],
+) -> None:
+
+    print()
+    print("Prefill summary")
+    print("---------------")
+
+    print(
+        f"{'Request':<16}"
+        f"{'Prompt tokens':<16}"
+        f"{'TTFT(s)':<14}"
+        f"{'Total(s)':<14}"
+    )
+
+    print("-" * 60)
+
+    for row in prefill_summary_rows:
+
+        ttft = row[
+            "time_to_first_token_seconds"
+        ]
+
+        if ttft is None:
+            formatted_ttft = "N/A"
+        else:
+            formatted_ttft = (
+                f"{ttft:.4f}"
+            )
+
+        print(
+            f"{row['request_id']:<16}"
+            f"{row['exact_prompt_tokens']:<16}"
+            f"{formatted_ttft:<14}"
+            f"{row['total_request_seconds']:<14.4f}"
+        )
+
+    print()
 
 
 def print_prediction(
@@ -219,26 +382,29 @@ def print_prediction(
     print("----------")
 
     print(
-        "As prompt length increases, prefill attention performs "
-        "substantially more attention work."
+        "As prompt length grows from roughly 256 to 4096 tokens, "
+        "prefill attention must process substantially more "
+        "query-key interactions."
     )
 
     print(
-        "The optimized ROCm attention backend should tile the "
-        "attention calculation instead of materializing the entire "
+        "The optimized ROCm attention implementation should tile "
+        "that work rather than materializing the complete N x N "
         "attention-score matrix in HBM."
     )
 
     if experiment_mode == "default":
+
         print(
-            "We first observe whichever attention backend vLLM "
-            "selects by default in the current ROCm image."
+            "We first observe the attention backend selected "
+            "normally by this vLLM/ROCm image."
         )
 
     elif experiment_mode == "aiter":
+
         print(
-            "With AITER enabled, Qwen's MHA attention should use "
-            "an AITER attention path when supported."
+            "This optional follow-up starts vLLM with AITER enabled "
+            "and observes whether backend/kernel selection changes."
         )
 
     print()
@@ -248,22 +414,32 @@ def print_server_requirement(
     experiment_mode: str,
 ) -> None:
 
-    print("Required server configuration")
-    print("-----------------------------")
+    print(
+        "Required server configuration"
+    )
+
+    print(
+        "-----------------------------"
+    )
 
     if experiment_mode == "default":
 
         print(
-            "Normal Qwen3 server. Do not force an attention backend."
+            "Normal Qwen3 server."
+        )
+
+        print(
+            "Do NOT force an attention backend."
         )
 
     elif experiment_mode == "aiter":
 
         print(
-            "Same Qwen3 server with:"
+            "Optional comparison server with:"
         )
 
         print()
+
         print(
             "  VLLM_ROCM_USE_AITER=1"
         )
@@ -271,8 +447,7 @@ def print_server_requirement(
         print()
 
         print(
-            "Do not force --attention-backend initially. "
-            "Record which backend vLLM auto-selects."
+            "Do NOT force --attention-backend."
         )
 
     print()
@@ -284,19 +459,21 @@ def print_evidence_goal() -> None:
     print("-------------")
 
     print(
-        "For each prompt length:"
+        "For each isolated prefill size:"
     )
+
+    print()
 
     print(
         "  exact prompt tokens"
     )
 
     print(
-        "  selected ROCm attention backend"
+        "  selected attention backend"
     )
 
     print(
-        "  actual attention kernel name"
+        "  actual prefill attention kernel"
     )
 
     print(
@@ -304,7 +481,8 @@ def print_evidence_goal() -> None:
     )
 
     print(
-        "  targeted memory traffic if profiler capture is needed"
+        "  memory traffic only if targeted profiling "
+        "is needed to answer the mechanism question"
     )
 
     print()
@@ -314,8 +492,8 @@ def parse_arguments() -> argparse.Namespace:
 
     argument_parser = argparse.ArgumentParser(
         description=(
-            "EXP-06: Observe how MI300X executes long-prompt "
-            "prefill attention as sequence length grows."
+            "EXP-06: Observe how MI300X executes "
+            "long-prompt prefill attention."
         )
     )
 
@@ -325,10 +503,10 @@ def parse_arguments() -> argparse.Namespace:
             "default",
             "aiter",
         ],
-        required=True,
+        default="default",
         help=(
-            "default = use normal vLLM backend selection; "
-            "aiter = start server with VLLM_ROCM_USE_AITER=1"
+            "default = observe normal backend selection; "
+            "aiter = optional follow-up with AITER enabled"
         ),
     )
 
@@ -378,69 +556,32 @@ def main() -> None:
             experiment_mode=arguments.mode,
         )
 
+        print()
+        print(
+            "Execution order:"
+        )
+
+        print(
+            "PREFILL-256 -> finish"
+        )
+
+        print(
+            "PREFILL-1024 -> finish"
+        )
+
+        print(
+            "PREFILL-4096 -> finish"
+        )
+
+        print()
+
         return
 
-    request_results, event_records = (
-        run_staggered_requests(
-            request_specs=request_specs,
-            experiment_name=EXPERIMENT_NAME,
-            experiment_mode=arguments.mode,
-            vllm_url=arguments.vllm_url,
-        )
-    )
-
-    mode_results_directory = (
-        RESULTS_DIRECTORY
-        / arguments.mode
-    )
-
-    write_csv(
-        records=request_results,
-        output_path=(
-            mode_results_directory
-            / "request-results.csv"
-        ),
-    )
-
-    write_jsonl(
-        records=event_records,
-        output_path=(
-            mode_results_directory
-            / "client-events.jsonl"
-        ),
-    )
-
-    write_prefill_summary(
+    run_prefill_experiment(
         request_specs=request_specs,
-        request_results=request_results,
+        experiment_mode=arguments.mode,
         vllm_url=arguments.vllm_url,
-        output_path=(
-            mode_results_directory
-            / "prefill-summary.csv"
-        ),
     )
-
-    print(
-        "Evidence saved under:"
-    )
-
-    print(
-        mode_results_directory
-    )
-
-    print()
-
-    print(
-        "Primary mechanism evidence still comes from the "
-        "server startup log and targeted kernel trace:"
-    )
-
-    print(
-        "prompt length -> attention backend -> "
-        "attention kernel -> memory behavior"
-    )
-
-    print()
 
 
 if __name__ == "__main__":

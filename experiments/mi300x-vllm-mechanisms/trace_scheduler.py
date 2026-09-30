@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 from vllm.v1.core.sched.scheduler import Scheduler
 
@@ -19,6 +20,10 @@ class TraceScheduler(Scheduler):
         super().__init__(*args, **kwargs)
 
         self._trace_step = 0
+
+        self._trace_kv_block_ids = (
+        os.getenv("TRACE_KV_BLOCK_IDS", "0") == "1"
+    )
 
 
     def schedule(self, *args, **kwargs):
@@ -97,41 +102,113 @@ class TraceScheduler(Scheduler):
         scheduler_output,
     ) -> dict[str, dict]:
         """
-        Build readable state for requests already known to the worker.
+        Describe what each scheduled request looks like at this
+        scheduler iteration.
 
-        CachedRequestData gives us:
-        - request ID
-        - tokens computed before this scheduler step
-        - output tokens already generated
+        New requests:
+            SchedulerOutput already contains their initial block table.
 
-        Combined with num_scheduled_tokens, this helps us distinguish
-        large prefill/chunk work from normal one-token decode work.
+        Cached/running requests:
+            Ask KVCacheManager for their complete current block table.
+
+        Full physical block IDs are printed only when
+        TRACE_KV_BLOCK_IDS=1.
         """
 
+        request_states: dict[str, dict] = {}
+
+        #
+        # Requests being scheduled for the first time.
+        #
+        for new_request in scheduler_output.scheduled_new_reqs:
+
+            block_ids_by_group = [
+                list(block_group)
+                for block_group in new_request.block_ids
+            ]
+
+            request_state = {
+                "request_kind": "new",
+
+                "prompt_token_count": (
+                    len(new_request.prompt_token_ids)
+                    if new_request.prompt_token_ids is not None
+                    else 0
+                ),
+
+                "num_computed_tokens_before_step":
+                    new_request.num_computed_tokens,
+
+                "num_output_tokens_before_step": 0,
+
+                "num_tokens_scheduled_now":
+                    scheduler_output.num_scheduled_tokens.get(
+                        new_request.req_id,
+                        0,
+                    ),
+
+                "physical_block_count":
+                    sum(
+                        len(block_group)
+                        for block_group in block_ids_by_group
+                    ),
+            }
+
+            if self._trace_kv_block_ids:
+                request_state[
+                    "physical_block_ids_by_group"
+                ] = block_ids_by_group
+
+            request_states[
+                new_request.req_id
+            ] = request_state
+
+        #
+        # Requests that have already been scheduled previously.
+        #
         cached_requests = (
             scheduler_output.scheduled_cached_reqs
         )
-
-        request_states = {}
 
         for (
             request_id,
             num_computed_tokens,
             num_output_tokens,
+            new_block_ids,
         ) in zip(
             cached_requests.req_ids,
             cached_requests.num_computed_tokens,
             cached_requests.num_output_tokens,
+            cached_requests.new_block_ids,
         ):
 
-            num_tokens_scheduled_now = (
-                scheduler_output.num_scheduled_tokens.get(
-                    request_id,
-                    0,
+            all_block_ids = (
+                self.kv_cache_manager.get_block_ids(
+                    request_id
                 )
             )
 
-            request_states[request_id] = {
+            all_block_ids_by_group = [
+                list(block_group)
+                for block_group in all_block_ids
+            ]
+
+            if new_block_ids is None:
+                new_block_ids_by_group = []
+            else:
+                new_block_ids_by_group = [
+                    list(block_group)
+                    for block_group in new_block_ids
+                ]
+
+            request_state = {
+                "request_kind": "cached",
+
+                "is_resumed": (
+                    request_id
+                    in cached_requests.resumed_req_ids
+                ),
+
                 "num_computed_tokens_before_step":
                     num_computed_tokens,
 
@@ -139,7 +216,38 @@ class TraceScheduler(Scheduler):
                     num_output_tokens,
 
                 "num_tokens_scheduled_now":
-                    num_tokens_scheduled_now,
+                    scheduler_output.num_scheduled_tokens.get(
+                        request_id,
+                        0,
+                    ),
+
+                "physical_block_count":
+                    sum(
+                        len(block_group)
+                        for block_group
+                        in all_block_ids_by_group
+                    ),
+
+                "new_block_count_this_step":
+                    sum(
+                        len(block_group)
+                        for block_group
+                        in new_block_ids_by_group
+                    ),
             }
+
+            if self._trace_kv_block_ids:
+
+                request_state[
+                    "physical_block_ids_by_group"
+                ] = all_block_ids_by_group
+
+                request_state[
+                    "new_block_ids_this_step"
+                ] = new_block_ids_by_group
+
+            request_states[
+                request_id
+            ] = request_state
 
         return request_states
