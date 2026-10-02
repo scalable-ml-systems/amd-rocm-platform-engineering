@@ -1,0 +1,12 @@
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R1", "event_name": "request_started", "elapsed_seconds": 0.0003104659990640357, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R2", "event_name": "request_started", "elapsed_seconds": 0.0500699229996826, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R3", "event_name": "request_started", "elapsed_seconds": 0.10006622999935644, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R4", "event_name": "request_started", "elapsed_seconds": 0.15006529200036312, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R1", "event_name": "first_token_received", "elapsed_seconds": 1.7285929400004534, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R4", "event_name": "first_token_received", "elapsed_seconds": 1.7365960129991436, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R3", "event_name": "first_token_received", "elapsed_seconds": 1.7366952930005937, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R2", "event_name": "first_token_received", "elapsed_seconds": 1.736787521000224, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R1", "event_name": "request_finished", "elapsed_seconds": 10.47681836800075, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R2", "event_name": "request_finished", "elapsed_seconds": 11.061635131000003, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R3", "event_name": "request_finished", "elapsed_seconds": 11.962513602999024, "value": ""}
+{"experiment_name": "03-kv-cache", "experiment_mode": "pressure", "request_id": "R4", "event_name": "request_finished", "elapsed_seconds": 13.138794051999866, "value": ""}

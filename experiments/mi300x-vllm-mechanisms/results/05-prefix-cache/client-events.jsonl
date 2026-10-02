@@ -1,0 +1,9 @@
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R1-COLD", "event_name": "request_started", "elapsed_seconds": 0.038893115999599104, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R1-COLD", "event_name": "first_token_received", "elapsed_seconds": 1.757650182999896, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R1-COLD", "event_name": "request_finished", "elapsed_seconds": 1.965741197999705, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R2-REUSE", "event_name": "request_started", "elapsed_seconds": 1.9737547049999193, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R2-REUSE", "event_name": "first_token_received", "elapsed_seconds": 2.003981931999988, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R2-REUSE", "event_name": "request_finished", "elapsed_seconds": 2.2120118610000645, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R3-MUTATED", "event_name": "request_started", "elapsed_seconds": 2.219357401999332, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R3-MUTATED", "event_name": "first_token_received", "elapsed_seconds": 2.8278457259993957, "value": ""}
+{"experiment_name": "05-prefix-cache", "experiment_mode": "prefix-reuse", "request_id": "R3-MUTATED", "event_name": "request_finished", "elapsed_seconds": 3.0364728119993742, "value": ""}

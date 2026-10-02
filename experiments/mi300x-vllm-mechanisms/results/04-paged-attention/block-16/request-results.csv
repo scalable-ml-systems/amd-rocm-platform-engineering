@@ -1,0 +1,8 @@
+request_id,request_started_seconds,first_token_seconds,request_finished_seconds,time_to_first_token_seconds,total_request_seconds,output_text
+R1-PAGED-KV,0.0004181829999652109,1.6267566420001458,2.04746164900007,1.6263384590001806,2.0470434660001047,"The **GPU memory hierarchy** is a critical component of modern GPUs, designed to optimize performance by balancing **speed**, **capacity**, and **access latency**. It includes several types of memory, each with different characteristics. Here's a breakdown of the main components:
+
+---
+
+## **1. GPU Memory Hierarchy Overview**
+
+"

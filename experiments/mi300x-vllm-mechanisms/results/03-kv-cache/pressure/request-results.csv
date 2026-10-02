@@ -1,0 +1,298 @@
+request_id,request_started_seconds,first_token_seconds,request_finished_seconds,time_to_first_token_seconds,total_request_seconds,output_text
+R1,0.0003104659990640357,1.7285929400004534,10.47681836800075,1.7282824740013893,10.476507902001686,"The **GPU memory hierarchy** is a critical aspect of modern GPU architecture, designed to optimize performance by balancing **speed**, **capacity**, and **latency**. It is structured in a way that allows the GPU to access data quickly while managing the limited on-chip memory resources efficiently. The hierarchy typically includes the following components, arranged from the **fastest and smallest** to the **slowest and largest**:
+
+---
+
+## 1. **Registers**
+
+### Description:
+- **Registers** are the **fastest** and **smallest** memory units in the GPU.
+- Each **thread** (in CUDA, for example) has its own set of registers.
+- They are **private** to each thread and are used to store **local variables** and intermediate results.
+
+### Key Features:
+- **Access latency**: ~1 cycle.
+- **Size**: Typically 32–128 bits per register, with a total of 64–256 registers per thread (depending on the GPU architecture).
+- **Usage**: Used for temporary storage of data that is frequently accessed by a single thread.
+
+### Example:
+In CUDA, a thread might store a local variable in a register, which is accessed very quickly.
+
+### Limitations:
+- Limited in number.
+- If too many registers are used, the GPU may **spill** them to **local memory**, which is much slower.
+
+---
+
+## 2. **Shared Memory (SMEM)**
+
+### Description:
+- **Shared memory** is a **fast, on-chip memory** that is **shared among threads** within a **warp** or **thread block**.
+- It is **programmable** and can be used to **share data between threads** in a block.
+
+### Key Features:
+- **Access latency**: ~10–100 cycles.
+- **Size**: Typically 48 KB to 96 KB per multiprocessor (SM) in modern GPUs.
+- **Usage**: Used for **data reuse** and **inter-thread communication**.
+
+### Example:
+In a matrix multiplication kernel, shared memory can be used to load a tile of the matrix into shared memory, which is then accessed by multiple threads in the block.
+
+### Limitations:
+- Limited in size.
+- Must be explicitly managed by the programmer (e.g., in CUDA, using `__shared__` variables).
+
+---
+
+## 3. **L1 Cache (Level 1 Cache)**
+
+### Description:
+- The **L1 cache** is a **small, fast cache** that sits between the **shared memory** and the **L2 cache**.
+- It is used to **store recently accessed data** from global memory or shared memory.
+
+### Key Features:
+- **Access latency**: ~10–100 cycles.
+- **Size**: Typically 64 KB to 128 KB per SM.
+- **Usage**: Reduces the number of accesses to the L2 cache and global memory.
+
+### Example:
+If a thread accesses a global memory address multiple times, the L1 cache can store the data to avoid repeated global memory accesses.
+
+### Limitations:
+- Smaller than L2 cache.
+- Can be **configured** (e.g., in CUDA, you can choose to use L1 as cache or as shared memory).
+
+---
+
+## 4. **L2 Cache (Level 2 Cache)**
+
+### Description:
+- The **L2 cache** is a **larger, slower** cache that is shared across all **multiprocessors (SMs)** in the GPU.
+- It acts as a **buffer** between the **L1 cache** and **global memory**.
+
+### Key Features:
+- **Access latency**: ~100–200 cycles.
+"
+R2,0.0500699229996826,1.736787521000224,11.061635131000003,1.6867175980005413,11.01156520800032,"An **inference scheduler** is a critical component in systems that perform **machine learning inference**, especially in environments where multiple models, tasks, or requests need to be managed efficiently. It ensures that inference requests are processed in a way that optimizes **resource utilization**, **latency**, **throughput**, and **fairness** across different workloads.
+
+Below is a **systematic explanation** of how an inference scheduler works, breaking it down into its **components** and **functions**.
+
+---
+
+## 1. **Request Queueing and Admission Control**
+
+### **Purpose:**
+To manage incoming inference requests and decide whether to accept or reject them based on system capacity and policies.
+
+### **Components:**
+
+- **Request Ingestion:**
+  - Incoming requests (e.g., from APIs, microservices, or other systems) are received and parsed.
+  - Each request includes:
+    - Input data (e.g., image, text, sensor data)
+    - Model identifier (which model to use)
+    - Priority or QoS (Quality of Service) level
+    - Deadline or SLA (Service Level Agreement) constraints
+
+- **Request Queue:**
+  - Requests are placed into a **queue** (e.g., FIFO, priority-based, or time-based).
+  - Queues can be **per-model**, **per-user**, or **global** depending on the system.
+
+- **Admission Control:**
+  - The scheduler decides whether to accept or reject a request based on:
+    - Available resources (CPU, GPU, memory)
+    - Current load and queue length
+    - SLA requirements
+    - Fairness policies (e.g., rate limiting, user quotas)
+
+---
+
+## 2. **Resource Allocation and Scheduling**
+
+### **Purpose:**
+To assign inference tasks to the appropriate hardware (CPU, GPU, TPU) and manage the execution order.
+
+### **Components:**
+
+- **Resource Monitoring:**
+  - Tracks the usage of:
+    - CPU cores
+    - GPU memory and compute units
+    - Memory bandwidth
+    - Network I/O (for distributed systems)
+  - Uses tools like **Prometheus**, **Grafana**, or **NVIDIA DCGM** for monitoring.
+
+- **Resource Allocation:**
+  - Assigns resources to inference tasks based on:
+    - Model requirements (e.g., model size, batch size, precision)
+    - Hardware capabilities (e.g., GPU vs. CPU)
+    - Task priority (e.g., high-priority requests get more resources)
+
+- **Scheduling Algorithms:**
+  - **First-Come-First-Served (FCFS):** Simple but may not be optimal for latency-sensitive tasks.
+  - **Priority Scheduling:** Assigns higher priority to certain tasks (e.g., real-time, high-revenue, or SLA-critical).
+  - **Round-Robin:** Distributes tasks evenly across available resources.
+  - **Deadline-Minimal Scheduling:** Prioritizes tasks that are closer to their deadlines.
+  - **Fair Share Scheduling:** Ensures that all users or models get a fair share of resources.
+
+- **Batching:**
+  - Combines multiple requests into a single batch to improve throughput and reduce overhead.
+  - Batching is especially useful for models that can process multiple inputs at once (e.g., batched inference).
+
+---
+
+## 3. **Model Execution and Execution Engine**
+
+### **Purpose:**
+To execute the inference tasks using the appropriate model and framework.
+
+### **Components:**
+
+- **Model Loaders:**
+  - Load models from storage (e.g., disk, cloud, or model registry).
+  - Support for different frameworks (TensorFlow, PyTorch, ONNX, etc.)
+
+- **Execution Engine"
+R3,0.10006622999935644,1.7366952930005937,11.962513602999024,1.6366290630012372,11.862447372999668,"**KV-Cache Management in Large Language Models (LLMs)**
+
+KV-cache (Key-Value Cache) is a critical optimization technique used in large language models (LLMs) to improve the efficiency of autoregressive generation, especially in scenarios like text generation, translation, and dialogue systems. It is particularly important in models like GPT, BERT, and other transformer-based architectures that use self-attention mechanisms.
+
+---
+
+## 1. **Understanding the Role of KV-Cache**
+
+In transformer-based models, the **self-attention mechanism** computes attention scores between all pairs of tokens in the input sequence. This is computationally expensive, especially for long sequences. However, in **autoregressive generation**, the model generates one token at a time, and the attention mechanism only needs to consider the previously generated tokens.
+
+### **Why KV-Cache?**
+- **Reduces redundant computation**: For each new token, the model doesn't need to recompute attention for all previous tokens.
+- **Speeds up inference**: By caching the key and value vectors from previous steps, the model can reuse them in subsequent steps.
+- **Scales better**: Enables efficient handling of long sequences and large context windows.
+
+---
+
+## 2. **Components of KV-Cache**
+
+The KV-cache consists of two main components:
+
+### **A. Key Cache (K Cache)**
+- Stores the **key vectors** from all previous tokens.
+- These keys are used to compute attention scores with the current query vector.
+- In autoregressive generation, the key vectors are computed once and reused for each new token.
+
+### **B. Value Cache (V Cache)**
+- Stores the **value vectors** from all previous tokens.
+- These values are used to compute the weighted sum of values based on the attention scores.
+- Like the key cache, the value vectors are computed once and reused.
+
+---
+
+## 3. **KV-Cache in the Transformer Architecture**
+
+In a standard transformer decoder, the self-attention layer computes:
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
+
+Where:
+- $ Q $: Query matrix
+- $ K $: Key matrix
+- $ V $: Value matrix
+- $ d_k $: Dimension of the key vectors
+
+In autoregressive generation, the model generates one token at a time. For each new token, the query vector is computed, and the attention is computed using the **key and value vectors from the previous tokens**.
+
+### **Without KV-Cache:**
+- For each new token, the model recomputes the entire attention matrix, which is O(n²) in time and space, where n is the sequence length.
+
+### **With KV-Cache:**
+- The key and value vectors from previous tokens are cached.
+- For the new token, only the new query is computed, and the attention is computed using the cached keys and values.
+- This reduces the time complexity to O(n) per step, making it feasible for long sequences.
+
+---
+
+## 4. **KV-Cache Management in Practice**
+
+### **A. Initialization**
+- At the start of generation, the key and value caches are empty.
+- As the model generates tokens, the key and value vectors for each token are computed and stored in the cache.
+
+### **B. Cache Storage**
+- The cache is typically stored as a list or a tensor, where each entry corresponds to a token.
+- For example, in a sequence of length $ n $, the key cache is a tensor of shape $ (n, d_k) $, and the value cache is $ (n, d_v) $.
+
+### **C. Cache"
+R4,0.15006529200036312,1.7365960129991436,13.138794051999866,1.5865307209987805,12.988728759999503,"Autoregressive decoding is a fundamental technique used in sequence generation tasks, particularly in natural language processing (NLP), speech recognition, and other sequential data modeling tasks. It is widely used in models like the Transformer, GPT, BERT, and other language models. The key idea behind autoregressive decoding is to generate sequences one token at a time, where each token is predicted based on the previously generated tokens.
+
+---
+
+## **1. Overview of Autoregressive Decoding**
+
+In autoregressive models, the probability of a sequence is factorized as a product of conditional probabilities:
+
+$$
+P(y_1, y_2, ..., y_T) = \prod_{t=1}^{T} P(y_t | y_1, y_2, ..., y_{t-1})
+$$
+
+This means that each token $ y_t $ is predicted based on the previous tokens in the sequence. The decoding process involves generating these tokens sequentially, using the model's learned conditional probabilities.
+
+---
+
+## **2. Core Components of Autoregressive Decoding**
+
+Let’s break down the process into its core components:
+
+---
+
+### **2.1. Model Architecture**
+
+The model used for autoregressive decoding is typically a **transformer-based language model**. It is trained to predict the next token in a sequence given the previous tokens. The model is trained using a **language modeling objective**, where the loss is computed over the predicted token at each position.
+
+- **Input**: A sequence of tokens $ x_1, x_2, ..., x_{t-1} $
+- **Output**: A probability distribution over the vocabulary for the next token $ x_t $
+
+---
+
+### **2.2. Initialization**
+
+At the beginning of the decoding process, the model is given a **starting token** (e.g., `<s>` or `<start>`), or a **prefix** (e.g., a prompt or a partial sequence). This initial token is used to start the generation process.
+
+- Example: If the prompt is ""The cat is"", the model starts with ""The"", ""cat"", ""is"", and then generates the next token.
+
+---
+
+### **2.3. Token-by-Token Generation**
+
+At each step $ t $, the model:
+
+1. **Takes the current sequence** $ y_1, y_2, ..., y_{t-1} $ as input.
+2. **Predicts the probability distribution** over the next token $ y_t $.
+3. **Selects a token** from this distribution (based on a decoding strategy).
+4. **Appends the selected token** to the sequence.
+5. **Repeats** until a stopping condition is met (e.g., reaching a maximum length, or generating an end-of-sequence token `<eos>`).
+
+---
+
+### **2.4. Decoding Strategies**
+
+The choice of decoding strategy determines how the model selects the next token. Common strategies include:
+
+#### **a. Greedy Decoding**
+
+- At each step, the model selects the token with the **highest probability**.
+- **Pros**: Fast, deterministic.
+- **Cons**: May lead to suboptimal or repetitive sequences.
+
+#### **b. Beam Search**
+
+- Maintains a fixed number of **top candidate sequences** (beam width) at each step.
+- At each step, the model expands each candidate by adding the most probable next tokens.
+- **Pros**: Better quality than greedy decoding.
+- **Cons**: Slower, more memory-intensive.
+
+#### **c. Sampling (e.g., Top-k, Top-p, Temperature)**
+
+- Instead of selecting the most probable token, the model **samples** from the probability distribution.
+- **Top-k Sampling**: Limits the token selection to the top k most probable tokens.
+-"

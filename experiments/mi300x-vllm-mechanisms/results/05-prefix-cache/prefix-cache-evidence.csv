@@ -1,0 +1,4 @@
+request_id,prefix_query_tokens,prefix_hit_tokens,prefix_hit_rate_percent,time_to_first_token_seconds,total_request_seconds
+R1-COLD,2082.0,0.0,0.0,1.718757067000297,1.926848082000106
+R2-REUSE,2082.0,2064.0,99.13544668587896,0.030227227000068524,0.2382571560001452
+R3-MUTATED,2081.0,0.0,0.0,0.6084883240000636,0.8171154100000422
