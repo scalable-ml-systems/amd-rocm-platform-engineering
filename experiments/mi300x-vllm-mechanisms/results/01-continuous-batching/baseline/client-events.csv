@@ -1,0 +1,13 @@
+experiment_name,experiment_mode,request_id,event_name,elapsed_seconds,value
+01-continuous-batching,baseline,R1,request_started,0.00032249600008071866,
+01-continuous-batching,baseline,R2,request_started,0.05006908499990459,
+01-continuous-batching,baseline,R3,request_started,0.1000753190000978,
+01-continuous-batching,baseline,R4,request_started,0.1500926079997953,
+01-continuous-batching,baseline,R1,first_token_received,1.6809580730000562,
+01-continuous-batching,baseline,R2,first_token_received,1.6881129270000201,
+01-continuous-batching,baseline,R4,first_token_received,1.6882262929998433,
+01-continuous-batching,baseline,R3,first_token_received,1.6883266750000985,
+01-continuous-batching,baseline,R4,request_finished,2.0581663019997904,
+01-continuous-batching,baseline,R3,request_finished,2.390085938000084,
+01-continuous-batching,baseline,R2,request_finished,2.6998337909999464,
+01-continuous-batching,baseline,R1,request_finished,2.910662341999796,

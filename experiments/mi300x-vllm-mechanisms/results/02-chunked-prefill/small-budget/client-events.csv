@@ -1,0 +1,7 @@
+experiment_name,experiment_mode,request_id,event_name,elapsed_seconds,value
+02-chunked-prefill,small-budget,R1-DECODE,request_started,0.0003604459998314269,
+02-chunked-prefill,small-budget,R2-LONG-PREFILL,request_started,0.10006572400016012,
+02-chunked-prefill,small-budget,R1-DECODE,first_token_received,1.7158070280001994,
+02-chunked-prefill,small-budget,R2-LONG-PREFILL,first_token_received,1.871559151999918,
+02-chunked-prefill,small-budget,R2-LONG-PREFILL,request_finished,2.106712317000074,
+02-chunked-prefill,small-budget,R1-DECODE,request_finished,3.580192229000204,

@@ -1,0 +1,23 @@
+request_id,request_started_seconds,first_token_seconds,request_finished_seconds,time_to_first_token_seconds,total_request_seconds,output_text
+R1,0.0002008610003940703,2.1660506310004166,3.0050419170001987,2.1658497700000225,3.0048410559998047,"GPU memory bandwidth plays a critical role in the performance of **large language model (LLM) inference**, especially when dealing with **large models** that require significant memory resources. Here's a detailed explanation of how GPU memory bandwidth affects LLM inference:
+
+---
+
+### 1. **What is GPU Memory Bandwidth?**
+
+**Memory bandwidth** refers to the rate at which data can be read from or written to the GPU's memory (VRAM). It is typically measured in **GB/s** (gigabytes per second). A higher memory bandwidth means the GPU can access and transfer data faster, which is essential for performance-critical applications"
+R2,0.050072760000148264,3.0533211360002497,3.680426470000384,3.0032483760001014,3.630353710000236,"Continuous batching is a technique used in deep learning inference to improve **GPU utilization** by keeping the GPU busy with a **steady stream of work** rather than processing requests one at a time. Here's why it can improve GPU utilization:
+
+---
+
+### 1. **Reduces Idle Time**
+- **Single request processing** often leads to **GPU underutilization** because the GPU may be idle while waiting for the next input.
+- **Continuous batching** groups multiple requests into a"
+R3,0.10009151100030067,3.728968021000128,4.143406010000035,3.6288765099998272,4.0433144989997345,"During **autoregressive decoding**, the **KV cache** (short for **Key-Value cache**) plays a crucial role in improving the efficiency of the decoding process, especially in large language models (LLMs) that generate text token by token.
+
+---
+
+### 🔍 What is Autoregressive Decoding?
+
+In aut"
+R4,0.15008460100034426,4.5388607530003355,4.742701883000336,4.388776151999991,4.592617281999992,A **GPU workgroup** (also known as a **work group** or **wavefront** in some architectures) is a fundamental unit of parallel execution in

@@ -1,0 +1,6 @@
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R1-DECODE", "event_name": "request_started", "elapsed_seconds": 0.0003604459998314269, "value": ""}
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R2-LONG-PREFILL", "event_name": "request_started", "elapsed_seconds": 0.10006572400016012, "value": ""}
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R1-DECODE", "event_name": "first_token_received", "elapsed_seconds": 1.7158070280001994, "value": ""}
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R2-LONG-PREFILL", "event_name": "first_token_received", "elapsed_seconds": 1.871559151999918, "value": ""}
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R2-LONG-PREFILL", "event_name": "request_finished", "elapsed_seconds": 2.106712317000074, "value": ""}
+{"experiment_name": "02-chunked-prefill", "experiment_mode": "small-budget", "request_id": "R1-DECODE", "event_name": "request_finished", "elapsed_seconds": 3.580192229000204, "value": ""}

@@ -1,0 +1,12 @@
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R1", "event_name": "request_started", "elapsed_seconds": 0.0002008610003940703, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R2", "event_name": "request_started", "elapsed_seconds": 0.050072760000148264, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R3", "event_name": "request_started", "elapsed_seconds": 0.10009151100030067, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R4", "event_name": "request_started", "elapsed_seconds": 0.15008460100034426, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R1", "event_name": "first_token_received", "elapsed_seconds": 2.1660506310004166, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R1", "event_name": "request_finished", "elapsed_seconds": 3.0050419170001987, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R2", "event_name": "first_token_received", "elapsed_seconds": 3.0533211360002497, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R2", "event_name": "request_finished", "elapsed_seconds": 3.680426470000384, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R3", "event_name": "first_token_received", "elapsed_seconds": 3.728968021000128, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R3", "event_name": "request_finished", "elapsed_seconds": 4.143406010000035, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R4", "event_name": "first_token_received", "elapsed_seconds": 4.5388607530003355, "value": ""}
+{"experiment_name": "01-continuous-batching", "experiment_mode": "break", "request_id": "R4", "event_name": "request_finished", "elapsed_seconds": 4.742701883000336, "value": ""}

@@ -1,0 +1,23 @@
+request_id,request_started_seconds,first_token_seconds,request_finished_seconds,time_to_first_token_seconds,total_request_seconds,output_text
+R1,0.00032249600008071866,1.6809580730000562,2.910662341999796,1.6806355769999755,2.910339845999715,"GPU memory bandwidth plays a critical role in the performance of **large language model (LLM) inference**, especially when dealing with **large models** that require significant memory resources. Here's a detailed explanation of how GPU memory bandwidth affects LLM inference:
+
+---
+
+### 1. **What is GPU Memory Bandwidth?**
+
+**Memory bandwidth** refers to the rate at which data can be read from or written to the GPU's memory (VRAM). It is typically measured in **GB/s** (gigabytes per second). A higher memory bandwidth means the GPU can access and transfer data faster, which is essential for performance-critical applications"
+R2,0.05006908499990459,1.6881129270000201,2.6998337909999464,1.6380438420001155,2.6497647060000418,"Continuous batching is a technique used in deep learning inference to improve **GPU utilization** by keeping the GPU busy with a steady stream of work, rather than processing each request individually. Here's a detailed explanation of why it can improve GPU utilization:
+
+---
+
+### 1. **Reducing Idle Time**
+- **Single request processing** often leads to **GPU underutilization** because the GPU may be idle while waiting for the next input.
+- **Continuous batching** groups multiple requests into"
+R3,0.1000753190000978,1.6883266750000985,2.390085938000084,1.5882513560000007,2.290010618999986,"During **autoregressive decoding**, the **KV cache** (short for **Key-Value cache**) plays a critical role in improving the efficiency of generating sequences, especially in large language models (LLMs) like those used in transformer-based architectures.
+
+---
+
+### 🔍 What is Autoregressive Decoding?
+
+Autore"
+R4,0.1500926079997953,1.6882262929998433,2.0581663019997904,1.538133685000048,1.9080736939999952,A **GPU workgroup** (also known as a **thread group** or **wavefront** in some architectures) is a collection of threads that execute the
