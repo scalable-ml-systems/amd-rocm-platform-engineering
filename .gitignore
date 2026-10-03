@@ -49,6 +49,11 @@ logs/
 tmp/
 temp/
 
+
+# Preserve MI300X experiment evidence
+!experiments/mi300x-vllm-mechanisms/results/logs/
+!experiments/mi300x-vllm-mechanisms/results/logs/*.log
+
 # Model artifacts
 *.safetensors
 *.bin
